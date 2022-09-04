@@ -1,0 +1,60 @@
+[
+  {
+    "entity": {
+      "alias": "lang.leftMneu.sysManage",
+      "name": "sysManagent",
+      "icon": "el-icon-setting",
+      "id": 0,
+      "value": ""
+    },
+    "childs": [
+      {
+        "entity": {
+          "alias": "lang.leftMneu.userManage",
+          "name": "UserManagement",
+          "icon": "el-icon-user",
+          "id": 1,
+          "value": "/UserManagement"
+        }
+      },
+      {
+        "entity": {
+          "alias": "lang.leftMneu.roleManage",
+          "name": "RoleManagement",
+          "icon": "el-icon-s-check",
+          "id": 2,
+          "value": "/RoleManagement"
+        }
+      },
+      {
+        "entity": {
+          "alias": "lang.leftMneu.menuManage",
+          "name": "MenuManage",
+          "icon": "el-icon-s-operation",
+          "id": 3,
+          "value": "/MenuManage"
+        }
+      }
+    ]
+  },
+  {
+    "entity": {
+      "alias": "lang.leftMneu.demoUse",
+      "name": "demoUse",
+      "icon": "el-icon-setting",
+      "id": 10,
+      "value": ""
+    },
+    "childs": [
+      {
+        "entity": {
+          "alias": "lang.leftMneu.pdfViewer",
+          "name": "pdfViewer",
+          "icon": "el-icon-user",
+          "id": 11,
+          "value": "/padfviewer"
+        }
+      }
+    ]
+  }
+]

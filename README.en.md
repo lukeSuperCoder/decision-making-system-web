@@ -1,7 +1,7 @@
-# decision-making-system
+# CommonTemplate
 
 #### Description
-后台管理系统测试框架
+基于vue2.X的前端通用模板，包含通用工具类，axios封装，基础webpack配置等
 
 #### Software Architecture
 Software architecture description
