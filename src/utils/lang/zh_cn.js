@@ -30,7 +30,7 @@ export const lang = {
     newAdd: "新建",
   },
   home: {
-    sysName: "中国铝业卓越技术中心分析系统",
+    sysName: "电解槽生产决策中心",
     logOut: "退出",
   },
   leftMneu: {

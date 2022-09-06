@@ -1,8 +1,8 @@
 [
   {
     "entity": {
-      "alias": "lang.leftMneu.sysManage",
-      "name": "sysManagent",
+      "alias": "多维分析",
+      "name": "MultidimensionalAnalysis",
       "icon": "el-icon-setting",
       "id": 0,
       "value": ""
@@ -10,37 +10,99 @@
     "childs": [
       {
         "entity": {
-          "alias": "lang.leftMneu.userManage",
-          "name": "UserManagement",
+          "alias": "多维分析",
+          "name": "MultidimensionalAnalysis",
           "icon": "el-icon-user",
           "id": 1,
-          "value": "/UserManagement"
-        }
-      },
-      {
-        "entity": {
-          "alias": "lang.leftMneu.roleManage",
-          "name": "RoleManagement",
-          "icon": "el-icon-s-check",
-          "id": 2,
-          "value": "/RoleManagement"
-        }
-      },
-      {
-        "entity": {
-          "alias": "lang.leftMneu.menuManage",
-          "name": "MenuManage",
-          "icon": "el-icon-s-operation",
-          "id": 3,
-          "value": "/MenuManage"
+          "value": "/MultidimensionalAnalysis"
         }
       }
     ]
   },
   {
     "entity": {
-      "alias": "lang.leftMneu.demoUse",
-      "name": "demoUse",
+      "alias": "特征工程",
+      "name": "CharacteristicEngineering",
+      "icon": "el-icon-setting",
+      "id": 2,
+      "value": ""
+    },
+    "childs": [
+      {
+        "entity": {
+          "alias": "特征工程",
+          "name": "CharacteristicEngineering",
+          "icon": "el-icon-user",
+          "id": 3,
+          "value": "/UserManagement"
+        }
+      }
+    ]
+  },
+  {
+    "entity": {
+      "alias": "模型应用",
+      "name": "ModelApplication",
+      "icon": "el-icon-setting",
+      "id": 4,
+      "value": ""
+    },
+    "childs": [
+      {
+        "entity": {
+          "alias": "模型应用",
+          "name": "ModelApplication",
+          "icon": "el-icon-user",
+          "id": 5,
+          "value": "/ModelApplication"
+        }
+      }
+    ]
+  },
+  {
+    "entity": {
+      "alias": "算法展示",
+      "name": "AlgorithmDisplay",
+      "icon": "el-icon-setting",
+      "id": 6,
+      "value": ""
+    },
+    "childs": [
+      {
+        "entity": {
+          "alias": "算法展示",
+          "name": "AlgorithmDisplay",
+          "icon": "el-icon-user",
+          "id": 7,
+          "value": "/AlgorithmDisplay"
+        }
+      }
+    ]
+  },
+  {
+    "entity": {
+      "alias": "功能设置",
+      "name": "FunctionSetting",
+      "icon": "el-icon-setting",
+      "id": 8,
+      "value": ""
+    },
+    "childs": [
+      {
+        "entity": {
+          "alias": "功能设置",
+          "name": "FunctionSetting",
+          "icon": "el-icon-user",
+          "id": 9,
+          "value": "/UserManagement"
+        }
+      }
+    ]
+  },
+  {
+    "entity": {
+      "alias": "系统设置",
+      "name": "SystemSettings",
       "icon": "el-icon-setting",
       "id": 10,
       "value": ""
@@ -48,11 +110,31 @@
     "childs": [
       {
         "entity": {
-          "alias": "lang.leftMneu.pdfViewer",
-          "name": "pdfViewer",
+          "alias": "系统设置",
+          "name": "SystemSettings",
           "icon": "el-icon-user",
           "id": 11,
-          "value": "/padfviewer"
+          "value": "/SystemSettings"
+        }
+      }
+    ]
+  },
+  {
+    "entity": {
+      "alias": "用户权限管理",
+      "name": "UserManagement",
+      "icon": "el-icon-setting",
+      "id": 12,
+      "value": ""
+    },
+    "childs": [
+      {
+        "entity": {
+          "alias": "用户权限管理",
+          "name": "UserManagement",
+          "icon": "el-icon-user",
+          "id": 13,
+          "value": "/UserManagement"
         }
       }
     ]

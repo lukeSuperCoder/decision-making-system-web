@@ -2,30 +2,37 @@
   <scale-box>
     <el-container>
       <el-header>
-        <div>{{ $t("lang.home.sysName") }}</div>
-        <div style="flex: 1"></div>
-        <switch-lang></switch-lang>
+        <div class="logo">{{ $t("lang.home.sysName") }}</div>
+        <i :class="isCollapse? 'el-icon-s-fold':'el-icon-s-unfold'" style="margin-left: 50px;cursor:pointer;" @click="switchCollapse"></i>
+        <div style="flex: 1">
+        </div>
+        <!-- <switch-lang></switch-lang> -->
         <div>
           <span class="timer">{{ currentTime }}</span>
           <div class="sxwCls">{{ $t(weekDay) + "&emsp;" + $t(sxw) }}</div>
         </div>
-        <div>
+        <!-- <div>
           <div class="rightHeader">
             <img class="imgCls" src="../assets/image/home/user.png" />
             <a class="username">{{ name }}</a>
           </div>
           <div class="uCls">{{ userName }}</div>
-        </div>
-        <img
+        </div> -->
+        <!-- <img
           src="../assets/image/home/logout1.png"
           :alt="$t('lang.home.logOut')"
           :title="$t('lang.home.logOut')"
           @click="logout"
-        />
+        /> -->
       </el-header>
       <el-container>
-        <el-aside>
-          <el-menu :default-active="activeIndex" router>
+        <el-aside class="aside-iscollapse" id="el-aside" v-show="isCollapse">
+          <el-menu :default-active="activeIndex" router :collapse="false">
+            <nav-menu :navMenus="menuData"></nav-menu>
+          </el-menu>
+        </el-aside>
+        <el-aside class="aside-notcollapse" v-show="!isCollapse">
+          <el-menu :default-active="activeIndex" router :collapse="true">
             <nav-menu :navMenus="menuData"></nav-menu>
           </el-menu>
         </el-aside>
@@ -59,6 +66,7 @@ export default {
       timer: "", //定义一个定时器的变量
       userName: sessionGet('deptName'),
       name: sessionGet('userName'),
+      isCollapse: true
     };
   },
   created() {
@@ -86,35 +94,38 @@ export default {
     this.initMenu();
   },
   methods: {
+    switchCollapse() {
+      this.isCollapse = !this.isCollapse;
+    },
     initMenu() {
-      roleHasMenu({roleId:sessionGet('roleId')}).then((response) => {
-        if (response['code'] === 0) {
-          let permissions = [];
-          response['data'].forEach(item => {
-            if (item["menuUrl"]&&item["menuUrl"].indexOf('::') > -1) {
-              permissions.push(item["menuUrl"]);
-            } else {
-              this.menuData.push({
-              "entity": {
-                "alias": item['notes']?item["notes"]:item["menuName"],
-                "name": item["menuUrl"]?item["menuUrl"]:'',
-                "icon": item['menuCode'],
-                "id": item['menuId'],
-                "parentId": item['parentMenuId'],
-                "value": item["menuUrl"]?item["menuUrl"]:''
-              }
-            });
-            }
-          });
-          sessionSet('permission',JSON.stringify({'permissions':permissions}));
-          this.menuData.sort((a,b) => {
-            return parseInt(b.id) - parseInt(a.id);
-          });
-          this.menuData = buildTree(this.menuData, 'id', 'parentId');
-          console.log(this.menuData)
-        }
-      });
-      // this.menuData = require("../assets/data/menus.json");
+      // roleHasMenu({roleId:sessionGet('roleId')}).then((response) => {
+      //   if (response['code'] === 0) {
+      //     let permissions = [];
+      //     response['data'].forEach(item => {
+      //       if (item["menuUrl"]&&item["menuUrl"].indexOf('::') > -1) {
+      //         permissions.push(item["menuUrl"]);
+      //       } else {
+      //         this.menuData.push({
+      //         "entity": {
+      //           "alias": item['notes']?item["notes"]:item["menuName"],
+      //           "name": item["menuUrl"]?item["menuUrl"]:'',
+      //           "icon": item['menuCode'],
+      //           "id": item['menuId'],
+      //           "parentId": item['parentMenuId'],
+      //           "value": item["menuUrl"]?item["menuUrl"]:''
+      //         }
+      //       });
+      //       }
+      //     });
+      //     sessionSet('permission',JSON.stringify({'permissions':permissions}));
+      //     this.menuData.sort((a,b) => {
+      //       return parseInt(b.id) - parseInt(a.id);
+      //     });
+      //     this.menuData = buildTree(this.menuData, 'id', 'parentId');
+      //     console.log(this.menuData)
+      //   }
+      // });
+      this.menuData = require("../assets/data/menus.json");
     },
     appendZero(obj) {
       if (obj < 10) {
@@ -137,9 +148,10 @@ export default {
 </script>
 <style lang="scss" scoped>
 .el-header ::v-deep {
-  background: url("../assets/image/home/top_bg.png");
-  background-size: cover;
-  color: #fff;
+  // background: url("../assets/image/home/top_bg.png");
+  // background-size: cover;
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #3B3D4A;
   display: flex;
   justify-content: flex-start;
   align-items: center;
@@ -149,18 +161,24 @@ export default {
   }
 }
 
-.el-aside ::v-deep {
+.aside-iscollapse ::v-deep {
   width: 200px !important;
   color: #fff;
   text-align: left !important;
-  background: url("../assets/image/home/left_bg.png");
+  background-color: #3B3D4A;
   z-index: 1;
   .el-menu-item.is-active {
-    background: #2e92d1 !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+    color: #3B3D4A;
+    text-align: center !important;
+  }
+  .el-menu-item.is-active:hover {
+    background: rgba(255, 255, 255, 1) !important;
+    color: #3B3D4A;
     text-align: center !important;
   }
   .el-submenu.is-active .el-submenu__title {
-    background: #1b386d;
+    background: rgba(3, 19, 33, 0.3)
   }
   .el-submenu__title:hover {
     background-color: rgba(3, 19, 33, 0.3) !important;
@@ -169,10 +187,9 @@ export default {
     background-color: rgba(3, 19, 33, 0.3) !important;
   }
   .el-menu-item {
-    font-size: 16px;
+    font-size: 14px;
     text-align: center;
     font-weight: 500;
-    box-shadow: 0px -1px 0px 0px #136fbf;
     color: whitesmoke;
   }
   .el-menu {
@@ -182,11 +199,65 @@ export default {
     color: white !important;
   }
   .el-submenu__title {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 500;
     text-align: left;
-    box-shadow: 0px -1px 0px 0px #136fbf;
-    background: rgba(27, 56, 109, 0.61);
+    color: #fff;
+  }
+  .el-icon-arrow-down:before {
+    content: "\e791";
+  }
+  .el-submenu.is-opened > .el-submenu__title .el-submenu__icon-arrow {
+    -webkit-transform: rotateZ(90deg);
+    transform: rotateZ(90deg);
+  }
+  .el-menu-item-group__title {
+    color: #fff !important;
+  }
+}
+
+.aside-notcollapse ::v-deep {
+  width: 3rem !important;
+  overflow-x: hidden;
+  color: #fff;
+  text-align: left !important;
+  background-color: #3B3D4A;
+  z-index: 1;
+  .el-menu-item.is-active {
+    background: rgba(255, 255, 255, 0.8) !important;
+    color: #3B3D4A;
+    text-align: center !important;
+  }
+  .el-menu-item.is-active:hover {
+    background: rgba(255, 255, 255, 1) !important;
+    color: #3B3D4A;
+    text-align: center !important;
+  }
+  .el-submenu.is-active .el-submenu__title {
+    background: rgba(3, 19, 33, 0.3)
+  }
+  .el-submenu__title:hover {
+    background-color: rgba(3, 19, 33, 0.3) !important;
+  }
+  .el-menu-item:hover {
+    background-color: rgba(3, 19, 33, 0.3) !important;
+  }
+  .el-menu-item {
+    font-size: 14px;
+    text-align: center;
+    font-weight: 500;
+    color: whitesmoke;
+  }
+  .el-menu {
+    background: rgba(255, 255, 255, 0) !important;
+  }
+  .el-submenu__title i {
+    color: white !important;
+  }
+  .el-submenu__title {
+    font-size: 16px;
+    font-weight: 500;
+    text-align: left;
     color: #fff;
   }
   .el-icon-arrow-down:before {
@@ -202,10 +273,9 @@ export default {
 }
 
 .el-main {
-  /*background-color: #E9EEF3;*/
+  background: #F7F7F7;
+  border: 1px solid #979797;
   color: #333;
-  background: url("../assets/image/home/table_bg.png") round !important;
-  background-size: cover !important;
   padding: 0;
 }
 

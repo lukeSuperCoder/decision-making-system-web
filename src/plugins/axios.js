@@ -32,6 +32,7 @@ Service.interceptors.request.use(
     //身份认证相关设置
     const token = sessionGet('token');
     token && (config.headers.token = token);
+    config.headers.token = "D0d2IE1rhS3cUmB8zDn/Yw=="
     return config;
   },
   function (error) {
