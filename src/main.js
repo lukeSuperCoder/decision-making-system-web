@@ -9,6 +9,8 @@ import SlideVerify from "vue-monoplasty-slide-verify";
 import VueI18n from "vue-i18n";
 import Rsa from "../src/utils/rsa.js";
 import { checkPermission } from "./utils/common";
+import echarts from "echarts";
+Vue.prototype.$echarts = echarts;
 Vue.prototype.Rsa = Rsa; // 将Rsa注册为公共方法,方便其他页面调用
 Vue.use(VueI18n);
 

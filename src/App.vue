@@ -82,4 +82,9 @@ body,
 .el-form-item--mini.el-form-item, .el-form-item--small.el-form-item{
   margin-bottom: 0px !important;
 }
+
+.el-popover.vmpopper {
+  max-height: 200px;
+  overflow-y: auto;
+}
 </style>

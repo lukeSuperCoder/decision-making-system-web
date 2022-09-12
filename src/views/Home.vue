@@ -59,7 +59,7 @@ export default {
   data() {
     return {
       menuData: [],
-      activeIndex: "UserManagement",
+      activeIndex: "OriginDataStatic",
       currentTime: new Date(), // 获取当前时间
       sxw: "lang.common.morning",
       weekDay: "",
@@ -273,10 +273,12 @@ export default {
 }
 
 .el-main {
-  background: #F7F7F7;
-  border: 1px solid #979797;
+  background: #fff;
+  border-top: 20px solid rgba(151, 151, 151, 0.3);
+  border-right: 15px solid rgba(151, 151, 151, 0.3);
+  border-bottom: 20px solid rgba(151, 151, 151, 0.3);
+  border-left: 15px solid rgba(151, 151, 151, 0.3);
   color: #333;
-  padding: 0;
 }
 
 .rightHeader {

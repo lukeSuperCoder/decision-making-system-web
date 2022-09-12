@@ -10,11 +10,49 @@
     "childs": [
       {
         "entity": {
-          "alias": "多维分析",
-          "name": "MultidimensionalAnalysis",
+          "alias": "原始数据多维展示",
+          "name": "OriginDataStatic",
           "icon": "el-icon-user",
           "id": 1,
-          "value": "/MultidimensionalAnalysis"
+          "value": "/OriginDataStatic"
+        }
+      },
+      {
+        "entity": {
+          "alias": "基本图表分析",
+          "name": "BaseChartAnalysis",
+          "icon": "el-icon-user",
+          "id": 2,
+          "value": "/BaseChartAnalysis"
+        }
+      }
+    ]
+  },
+  {
+    "entity": {
+      "alias": "数据预处理",
+      "name": "DataPretreatment",
+      "icon": "el-icon-setting",
+      "id": 0,
+      "value": ""
+    },
+    "childs": [
+      {
+        "entity": {
+          "alias": "空缺值填充",
+          "name": "NullData",
+          "icon": "el-icon-user",
+          "id": 1,
+          "value": "/NullData"
+        }
+      },
+      {
+        "entity": {
+          "alias": "异常值处理",
+          "name": "AbnormalData",
+          "icon": "el-icon-user",
+          "id": 2,
+          "value": "/AbnormalData"
         }
       }
     ]
@@ -24,24 +62,33 @@
       "alias": "特征工程",
       "name": "CharacteristicEngineering",
       "icon": "el-icon-setting",
-      "id": 2,
+      "id": 6,
       "value": ""
     },
     "childs": [
       {
         "entity": {
-          "alias": "特征工程",
+          "alias": "互相关分析",
           "name": "CharacteristicEngineering",
           "icon": "el-icon-user",
           "id": 3,
-          "value": "/UserManagement"
+          "value": "/CharacteristicEngineering"
+        }
+      },
+      {
+        "entity": {
+          "alias": "特征选取",
+          "name": "CharacteristicEngineering",
+          "icon": "el-icon-user",
+          "id": 3,
+          "value": "/CharacteristicEngineering"
         }
       }
     ]
   },
   {
     "entity": {
-      "alias": "模型应用",
+      "alias": "生产决策",
       "name": "ModelApplication",
       "icon": "el-icon-setting",
       "id": 4,
@@ -50,71 +97,20 @@
     "childs": [
       {
         "entity": {
-          "alias": "模型应用",
+          "alias": "决策模型训练",
           "name": "ModelApplication",
           "icon": "el-icon-user",
           "id": 5,
           "value": "/ModelApplication"
         }
-      }
-    ]
-  },
-  {
-    "entity": {
-      "alias": "算法展示",
-      "name": "AlgorithmDisplay",
-      "icon": "el-icon-setting",
-      "id": 6,
-      "value": ""
-    },
-    "childs": [
+      },
       {
         "entity": {
-          "alias": "算法展示",
-          "name": "AlgorithmDisplay",
+          "alias": "决策模型应用",
+          "name": "ModelApplication",
           "icon": "el-icon-user",
-          "id": 7,
-          "value": "/AlgorithmDisplay"
-        }
-      }
-    ]
-  },
-  {
-    "entity": {
-      "alias": "功能设置",
-      "name": "FunctionSetting",
-      "icon": "el-icon-setting",
-      "id": 8,
-      "value": ""
-    },
-    "childs": [
-      {
-        "entity": {
-          "alias": "功能设置",
-          "name": "FunctionSetting",
-          "icon": "el-icon-user",
-          "id": 9,
-          "value": "/UserManagement"
-        }
-      }
-    ]
-  },
-  {
-    "entity": {
-      "alias": "系统设置",
-      "name": "SystemSettings",
-      "icon": "el-icon-setting",
-      "id": 10,
-      "value": ""
-    },
-    "childs": [
-      {
-        "entity": {
-          "alias": "系统设置",
-          "name": "SystemSettings",
-          "icon": "el-icon-user",
-          "id": 11,
-          "value": "/SystemSettings"
+          "id": 5,
+          "value": "/ModelApplication"
         }
       }
     ]

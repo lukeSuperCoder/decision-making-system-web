@@ -183,3 +183,37 @@ export function updateAndDelMenu(params) {
     data: params,
   });
 }
+
+/**
+ * 获取槽号菜单
+ * @param params
+ */
+ export function getNoMenu() {
+  return Service({
+    url: "/api/getNoMenu",
+    method: "get"
+  });
+}
+
+/**
+ * 获取参数菜单
+ * @param params
+ */
+ export function getParamsMenu() {
+  return Service({
+    url: "/api/getParamsMenu",
+    method: "get"
+  });
+}
+
+/**
+ * 获取参数菜单
+ * @param params
+ */
+ export function getBaseChartByParam(params) {
+  return Service({
+    url: "/api/getBaseChart",
+    method: "post",
+    data: params
+  });
+}
