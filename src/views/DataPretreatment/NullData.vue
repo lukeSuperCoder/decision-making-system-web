@@ -3,13 +3,11 @@
         <el-row class="header">
             <div class="header-item">
                 选择训练数据源：
-                <el-popover popper-class="vmpopper" placement="bottom-start" width="450" trigger="click">
-                    <el-tree ref="tree" :data="tree_data" show-checkbox node-key="value"
-                    @check-change="handleCheckChange" :filter-node-method="filterNode">
-                    </el-tree>
-                    <el-input style="width:120px" slot="reference" placeholder="输入关键字" v-model="paramsText">
-                    </el-input>
-                </el-popover>
+                <el-select style="width:160px" v-model="form.origin" placeholder="请选择">
+                    <el-option  v-for="item in form.origin_options" :key="item.value" :label="item.label"
+                        :value="item.value">
+                    </el-option>
+                </el-select>
             </div>
             <div class="header-item">
                 剔除参数：
@@ -30,8 +28,8 @@
             </div>
             <div class="header-item">
                 填充方法：
-                <el-select style="width:180px" v-model="form.chart_type" collapse-tags multiple placeholder="请选择">
-                    <el-option v-for="item in form.chart_options" :key="item.value" :label="item.label" :value="item.value">
+                <el-select style="width:180px" v-model="form.fun" placeholder="请选择">
+                    <el-option v-for="item in form.fun_options" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
                 </el-select>
             </div>
@@ -43,7 +41,7 @@
                 </el-select>
             </div>
             <div class="header-item">
-                <el-button type="primary" @click="getCharts">查询</el-button>
+                <el-button type="primary" @click="getKnnCharts">查询</el-button>
             </div>
         </el-row>
         <el-row class="content">
@@ -69,19 +67,44 @@
 <script>
     import * as echarts from 'echarts';
     import {
-        getNoMenu,getParamsMenu,getBaseChartByParam
+        getNoMenu,getParamsMenu,getKnnChart
     } from '../../utils/request';
     export default {
         name: "AbnormalData",
         components: {},
         data() {
             return {
-                paramsText: '',
-                tree_data: [],
+                // paramsText: '',
+                // tree_data: [],
                 form: {
+                    origin: '',
+                    origin_options: [{
+                        label: '兰州铝业',
+                        value: '兰州铝业'
+                    }],
                     params: '',
                     params_options: [],
                     date: '',
+                    fun: '',
+                    fun_options: [{
+                        label: 'KNN',
+                        value: '1'
+                    },
+                    {
+                        label: '线性插值',
+                        value: '2'
+                    },
+                    {
+                        label: '均值法',
+                        value: '3'
+                    },
+                    {
+                        label: '最大值',
+                        value: '4'
+                    },{
+                        label: '最小值',
+                        value: '5'
+                    }],
                     chart_type: '',
                     chart_options: [{
                         label: '折线图',
@@ -108,17 +131,17 @@
             this.getNoMenuData();
         },
         watch: {
-            paramsText(val) {
-                this.$refs.tree.filter(val);
-            }
+            // paramsText(val) {
+            //     this.$refs.tree.filter(val);
+            // }
         },
         methods: {
             getNoMenuData() {
-                getNoMenu().then((res) => {
-                    if (res.code === 200) {
-                        this.tree_data = res.data;
-                    }
-                })
+                // getNoMenu().then((res) => {
+                //     if (res.code === 200) {
+                //         this.tree_data = res.data;
+                //     }
+                // })
                 getParamsMenu().then((res) => {
                     if (res.code === 200) {
                         this.form.params_options = res.data;
@@ -132,23 +155,31 @@
                 if (!value) return true;
                 return data.label.indexOf(value) !== -1;
             },
-            getCharts() {
-                var code_arr = this.$refs['tree'].getCheckedNodes().map((item) => {return item.value})
-                // var params = {
-                //     code: code_arr.toString(),
-                //     params: this.form.params.toString(),
-                //     date: this.form.date.toString(),
-                //     chart: this.form.chart_type.toString()
-                // }
-                var params = {
-                    "code": "0,3039,3040,3041,3042,3043,3044,3045,3046,3047,3048,3049,3050,3051,3052,3053,3054,3055,3056,3057,3058,3059,3060,3061,3062,3063,3064,3065,3066,3067,3068,3069,3070,3071,3072,3073,3074,3075,3076",
-                    "params": "FZB,CLL,YHLND",
-                    "date": "2021-02-01,2021-05-01",
-                    "chart": "1"
+            getKnnCharts() {
+                let code_arr = ['兰州铝业电解铝板块二厂(200kA)三车间二工区3039#电解槽']
+                var that = this;
+                let legend = ['槽控工艺报出铝量 (kg)','槽控日报设定电压 (V)','槽控工艺报铝水平 (cm)','槽控工艺报氧化铝浓度 (%)','槽控工艺报电解温度 (℃)',
+                '槽控工艺报分子比 (N/A)','槽控日报工作电压 (V)','槽控日报平均电压 (V)','槽控日报下料次数 (次)','槽控日报摆动 (mV)','槽控日报针振 (mV)']
+                that.form.params.forEach((j) => {
+                    legend.splice(legend.indexOf(j),1)
+                })
+                if(legend.length===0) {
+                    that.$message.warning('至少保留一项参数')
+                    return
                 }
+                var params = {
+                    params: legend.toString(),
+                    date: this.form.date.toString(),
+                    chart: this.form.chart_type.toString()
+                }
+                // var params = {
+                //     "params": "FZB,CLL,YHLND",
+                //     "date": "2021-02-01,2021-05-01",
+                //     "chart": "1"
+                // }
                 console.log(params);
                 this.series_list = []
-                getBaseChartByParam(params).then((res) => {
+                getKnnChart(params).then((res) => {
                     if(res.code === 200) {
                         let resdata = res.data;
                         var html = ''
@@ -157,7 +188,7 @@
                             code_arr.forEach(code_i => {
                                 var series_i = []
                                 res_i.data.forEach((data_i) => {
-                                    if(code_i === data_i.code) {
+                                    if(code_i === data_i.body) {
                                         series_i.push([data_i.time, parseFloat(data_i.value)])
                                     }
                                 })

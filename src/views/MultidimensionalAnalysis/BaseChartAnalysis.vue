@@ -150,7 +150,7 @@
                             code_arr.forEach(code_i => {
                                 var series_i = []
                                 res_i.data.forEach((data_i) => {
-                                    if(code_i === data_i.code) {
+                                    if(code_i === data_i.body) {
                                         series_i.push([data_i.time, parseFloat(data_i.value)])
                                     }
                                 })

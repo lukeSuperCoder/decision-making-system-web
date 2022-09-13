@@ -207,12 +207,24 @@ export function updateAndDelMenu(params) {
 }
 
 /**
- * 获取参数菜单
+ * 获取图表数据
  * @param params
  */
  export function getBaseChartByParam(params) {
   return Service({
     url: "/api/getBaseChart",
+    method: "post",
+    data: params
+  });
+}
+
+/**
+ * 获取knn图表数据
+ * @param params
+ */
+ export function getKnnChart(params) {
+  return Service({
+    url: "/api/getKnnChart",
     method: "post",
     data: params
   });

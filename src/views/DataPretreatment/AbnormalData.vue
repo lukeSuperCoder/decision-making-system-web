@@ -3,13 +3,11 @@
         <el-row class="header">
             <div class="header-item">
                 选择训练数据源：
-                <el-popover popper-class="vmpopper" placement="bottom-start" width="450" trigger="click">
-                    <el-tree ref="tree" :data="tree_data" show-checkbox node-key="value"
-                    @check-change="handleCheckChange" :filter-node-method="filterNode">
-                    </el-tree>
-                    <el-input style="width:120px" slot="reference" placeholder="输入关键字" v-model="paramsText">
-                    </el-input>
-                </el-popover>
+                <el-select style="width:160px" v-model="form.origin" collapse-tags multiple placeholder="请选择">
+                    <el-option  v-for="item in form.origin_options" :key="item.value" :label="item.label"
+                        :value="item.value">
+                    </el-option>
+                </el-select>
             </div>
             <div class="header-item">
                 剔除参数：
@@ -79,6 +77,11 @@
                 paramsText: '',
                 tree_data: [],
                 form: {
+                    origin: '',
+                    origin_options: [{
+                        label: '兰州铝业',
+                        value: '兰州铝业'
+                    }],
                     params: '',
                     params_options: [],
                     date: '',
