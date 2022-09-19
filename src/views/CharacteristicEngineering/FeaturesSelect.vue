@@ -2,7 +2,7 @@
     <div class="main">
         <el-row class="header">
             <div class="header-item">
-                选择训练数据源：
+                数据源：
                 <el-select style="width:160px" v-model="form.origin" collapse-tags multiple placeholder="请选择">
                     <el-option  v-for="item in form.origin_options" :key="item.value" :label="item.label"
                         :value="item.value">
@@ -10,43 +10,63 @@
                 </el-select>
             </div>
             <div class="header-item">
-                剔除参数：
-                <el-select style="width:160px" v-model="form.params" collapse-tags multiple placeholder="请选择">
+                参数：
+                <el-select style="width:250px" v-model="form.params" collapse-tags multiple placeholder="请选择">
                     <el-option  v-for="item in form.params_options" :key="item.value" :label="item.label"
                         :value="item.value">
                     </el-option>
                 </el-select>
-                <span style="margin-left: 20px;">起止时间：</span>
+                <!-- <span style="margin-left: 20px;">起止时间：</span> -->
             </div>
-            <div>
+            <!-- <div>
                 <div class="block">
                     <el-date-picker v-model="form.date" type="daterange" align="right" unlink-panels range-separator="至"
                         start-placeholder="开始日期" end-placeholder="结束日期" format="yyyy 年 MM 月 dd 日"
                         value-format="yyyy-MM-dd">
                     </el-date-picker>
                 </div>
-            </div>
+            </div> -->
             <div class="header-item">
-                填充方法：
+                算法：
                 <el-select style="width:180px" v-model="form.chart_type" collapse-tags multiple placeholder="请选择">
                     <el-option v-for="item in form.chart_options" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
                 </el-select>
             </div>
-            <div class="header-item">
+            <!-- <div class="header-item">
                 图表类型：
                 <el-select style="width:180px" v-model="form.chart_type" collapse-tags multiple placeholder="请选择">
                     <el-option v-for="item in form.chart_options" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
                 </el-select>
+            </div> -->
+            <div class="header-item">
+                <el-button type="primary" @click="addParams">添加参数</el-button>
+                <el-button type="primary" @click="reduceParams">删除参数</el-button>
             </div>
             <div class="header-item">
-                <el-button type="primary" @click="getCharts">查询</el-button>
+                <el-button type="primary" @click="drawChart2">开始</el-button>
+            </div>
+        </el-row>
+        <el-row style="margin-top:15px" class="header" v-for="index in form.select_params_list" :key="index">
+            <div class="header-item">
+                参数：
+                <el-select style="width:160px" v-model="form.select_params_value[index]" placeholder="请选择">
+                    <el-option  v-for="item in form.select_params_opt" :key="item.value" :label="item.label"
+                        :value="item.value">
+                    </el-option>
+                </el-select>
+            </div>
+            <div class="header-item">
+                值：<el-input style="width:160px" v-model="form.select_params_value[index]"></el-input>
             </div>
         </el-row>
         <el-row class="content">
             <el-card class="card">
                 <div id="echart-crad"></div>
+                <el-row type="flex" justify="center">
+                    <div id="echart2" style="width: 100%; height: 400px"></div>
+                </el-row>
                 <!-- <el-row type="flex" justify="center">
                     <div id="echart1" style="width: 100%; height: 400px"></div>
                 </el-row>
@@ -79,28 +99,49 @@
                 form: {
                     origin: '',
                     origin_options: [{
-                        label: '兰州铝业',
-                        value: '兰州铝业'
+                        label: '阈值-兰铝',
+                        value: '阈值-兰铝'
+                    },{
+                        label: '均值-兰铝',
+                        value: '均值-兰铝'
                     }],
                     params: '',
                     params_options: [],
                     date: '',
                     chart_type: '',
                     chart_options: [{
-                        label: '折线图',
+                        label: 'XGBoost',
                         value: '1'
                     },
                     {
-                        label: '柱状图',
+                        label: '随机森林',
                         value: '2'
                     },
                     {
-                        label: '散点图',
+                        label: '决策树',
                         value: '3'
                     },
                     {
-                        label: '饼状图',
+                        label: 'GA-lightGBM',
                         value: '4'
+                    }],
+                    select_params_list: 1,
+                    select_params_value: [],
+                    select_params_opt:[{
+                        label: 'num_leaves',
+                        value: '22'
+                    },
+                    {
+                        label: 'eta',
+                        value: '0.01'
+                    },
+                    {
+                        label: 'max_depth',
+                        value: '9'
+                    },
+                    {
+                        label: 'min_data_in_leaf',
+                        value: '1300'
                     }]
                 },
                 series_list: []
@@ -134,6 +175,16 @@
             filterNode(value, data) {
                 if (!value) return true;
                 return data.label.indexOf(value) !== -1;
+            },
+            addParams() { 
+                if(this.form.select_params_list < 4) {
+                    this.form.select_params_list += 1;
+                }
+            },
+            reduceParams() {
+                if(this.form.select_params_list > 0) {
+                    this.form.select_params_list -= 1;
+                }
             },
             getCharts() {
                 var code_arr = this.$refs['tree'].getCheckedNodes().map((item) => {return item.value})
@@ -261,20 +312,21 @@
                 // 指定图表的配置项和数据
                 let option = {
                     title: {
-                        text: "ECharts 入门示例",
+                        text: "影响出铝量的重要特征",
                     },
                     tooltip: {},
                     legend: {
-                        data: ["销量"],
+                        data: ["值"],
                     },
                     xAxis: {
-                        data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"],
+                        data: ["出铝量 (kg)", "设定电压 (V)", "报铝水平 (cm)", "电解温度 (℃)", "分子比 (N/A)",
+                         "工作电压 (V)","平均电压 (V)","下料次数 (次)","摆动 (mV)", "针振 (mV)"],
                     },
                     yAxis: {},
                     series: [{
-                        name: "销量",
+                        name: "值",
                         type: "bar",
-                        data: [5, 20, 36, 10, 10, 20],
+                        data: [1264, 602, 412, 369, 120, 80, 50, 30, 20, 10],
                     }, ],
                 };
                 // 使用刚指定的配置项和数据显示图表。

@@ -2,46 +2,34 @@
     <div class="main">
         <el-row class="header">
             <div class="header-item">
-                选择训练数据源：
+                决策模型：
                 <el-select style="width:160px" v-model="form.origin" collapse-tags multiple placeholder="请选择">
                     <el-option  v-for="item in form.origin_options" :key="item.value" :label="item.label"
                         :value="item.value">
                     </el-option>
                 </el-select>
             </div>
+        </el-row>
+        <el-row class="header" style="margin-top:15px">
             <div class="header-item">
-                剔除参数：
-                <el-select style="width:160px" v-model="form.params" collapse-tags multiple placeholder="请选择">
-                    <el-option  v-for="item in form.params_options" :key="item.value" :label="item.label"
+                参数设置：
+                Num_layers：<el-input style="width:150px"></el-input>
+                Hidden_size：<el-input style="width:150px"></el-input>
+                lr：<el-input style="width:150px"></el-input>
+            </div>
+        </el-row>
+        <el-row class="header" style="margin-top:15px">
+            <div class="header-item">
+                决策特征：
+                <el-select style="width:160px" v-model="form.origin" collapse-tags multiple placeholder="请选择">
+                    <el-option  v-for="item in form.chart_options" :key="item.value" :label="item.label"
                         :value="item.value">
                     </el-option>
                 </el-select>
-                <span style="margin-left: 20px;">起止时间：</span>
-            </div>
-            <div>
-                <div class="block">
-                    <el-date-picker v-model="form.date" type="daterange" align="right" unlink-panels range-separator="至"
-                        start-placeholder="开始日期" end-placeholder="结束日期" format="yyyy 年 MM 月 dd 日"
-                        value-format="yyyy-MM-dd">
-                    </el-date-picker>
-                </div>
             </div>
             <div class="header-item">
-                填充方法：
-                <el-select style="width:180px" v-model="form.chart_type" collapse-tags multiple placeholder="请选择">
-                    <el-option v-for="item in form.chart_options" :key="item.value" :label="item.label" :value="item.value">
-                    </el-option>
-                </el-select>
-            </div>
-            <div class="header-item">
-                图表类型：
-                <el-select style="width:180px" v-model="form.chart_type" collapse-tags multiple placeholder="请选择">
-                    <el-option v-for="item in form.chart_options" :key="item.value" :label="item.label" :value="item.value">
-                    </el-option>
-                </el-select>
-            </div>
-            <div class="header-item">
-                <el-button type="primary" @click="getCharts">查询</el-button>
+                <el-button type="primary" @click="getCharts">清除</el-button>
+                <el-button type="primary" @click="getCharts">进行决策</el-button>
             </div>
         </el-row>
         <el-row class="content">
@@ -79,28 +67,35 @@
                 form: {
                     origin: '',
                     origin_options: [{
-                        label: '兰州铝业',
-                        value: '兰州铝业'
+                        label: 'LSTM',
+                        value: 'LSTM'
+                    },{
+                        label: 'fLSTM',
+                        value: 'fLSTM'
+                    },{
+                        label: 'MAP-LSTM',
+                        value: 'MAP-LSTM'
+                    },{
+                        label: 'MAP-fLSTM',
+                        value: 'MAP-fLSTM'
+                    },{
+                        label: 'TF-MAP-LSTM',
+                        value: 'TF-MAP-LSTM'
+                    },{
+                        label: 'TF-MAP-fLSTM',
+                        value: 'TF-MAP-fLSTM'
                     }],
                     params: '',
                     params_options: [],
                     date: '',
                     chart_type: '',
                     chart_options: [{
-                        label: '折线图',
+                        label: '出铝量',
                         value: '1'
                     },
                     {
-                        label: '柱状图',
+                        label: '设定电压调整量',
                         value: '2'
-                    },
-                    {
-                        label: '散点图',
-                        value: '3'
-                    },
-                    {
-                        label: '饼状图',
-                        value: '4'
                     }]
                 },
                 series_list: []

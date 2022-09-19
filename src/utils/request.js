@@ -229,3 +229,16 @@ export function updateAndDelMenu(params) {
     data: params
   });
 }
+
+
+/**
+ * 获取Abnormal图表数据
+ * @param params
+ */
+ export function getAbnChart(params) {
+  return Service({
+    url: "/api/getAbnChart",
+    method: "post",
+    data: params
+  });
+}

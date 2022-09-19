@@ -2,41 +2,16 @@
     <div class="main">
         <el-row class="header">
             <div class="header-item">
-                选择训练数据源：
-                <el-select style="width:160px" v-model="form.origin" collapse-tags multiple placeholder="请选择">
-                    <el-option  v-for="item in form.origin_options" :key="item.value" :label="item.label"
-                        :value="item.value">
-                    </el-option>
-                </el-select>
-            </div>
-            <div class="header-item">
-                剔除参数：
-                <el-select style="width:160px" v-model="form.params" collapse-tags multiple placeholder="请选择">
-                    <el-option  v-for="item in form.params_options" :key="item.value" :label="item.label"
-                        :value="item.value">
-                    </el-option>
-                </el-select>
-                <span style="margin-left: 20px;">起止时间：</span>
-            </div>
-            <div>
-                <div class="block">
-                    <el-date-picker v-model="form.date" type="daterange" align="right" unlink-panels range-separator="至"
-                        start-placeholder="开始日期" end-placeholder="结束日期" format="yyyy 年 MM 月 dd 日"
-                        value-format="yyyy-MM-dd">
-                    </el-date-picker>
-                </div>
-            </div>
-            <div class="header-item">
-                填充方法：
+                模型：
                 <el-select style="width:180px" v-model="form.chart_type" collapse-tags multiple placeholder="请选择">
                     <el-option v-for="item in form.chart_options" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
                 </el-select>
             </div>
             <div class="header-item">
-                图表类型：
-                <el-select style="width:180px" v-model="form.chart_type" collapse-tags multiple placeholder="请选择">
-                    <el-option v-for="item in form.chart_options" :key="item.value" :label="item.label" :value="item.value">
+                优化：
+                <el-select style="width:180px" v-model="form.origin" collapse-tags multiple placeholder="请选择">
+                    <el-option v-for="item in form.origin_options" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
                 </el-select>
             </div>
@@ -47,6 +22,40 @@
         <el-row class="content">
             <el-card class="card">
                 <div id="echart-crad"></div>
+                <el-table
+                    :data="tableData"
+                    style="width: 100%">
+                    <el-table-column
+                        prop="value"
+                        label="结果"
+                        align="center">
+                    </el-table-column>
+                    <el-table-column
+                        prop="Num_layers"
+                        label="Num_layers"
+                        align="center">
+                    </el-table-column>
+                    <el-table-column
+                        prop="Hidden_size"
+                        label="Hidden_size"
+                        align="center">
+                    </el-table-column>
+                    <el-table-column
+                        prop="lr"
+                        label="lr"
+                        align="center">
+                    </el-table-column>
+                    <el-table-column
+                        prop="Batch_size"
+                        label="Batch_size"
+                        align="center">
+                    </el-table-column>
+                    <el-table-column
+                        prop="optimizer"
+                        label="optimizer"
+                        align="center">
+                    </el-table-column>
+                    </el-table>
                 <!-- <el-row type="flex" justify="center">
                     <div id="echart1" style="width: 100%; height: 400px"></div>
                 </el-row>
@@ -79,31 +88,58 @@
                 form: {
                     origin: '',
                     origin_options: [{
-                        label: '兰州铝业',
-                        value: '兰州铝业'
+                        value: '1',
+                        label: '无'
+                    },{
+                        value: '1',
+                        label: 'MPA'
+                    },{
+                        value: '1',
+                        label: 'TF-MPA'
                     }],
                     params: '',
                     params_options: [],
                     date: '',
                     chart_type: '',
                     chart_options: [{
-                        label: '折线图',
+                        label: 'LSTM',
                         value: '1'
                     },
                     {
-                        label: '柱状图',
+                        label: 'fLSTM',
                         value: '2'
-                    },
-                    {
-                        label: '散点图',
-                        value: '3'
-                    },
-                    {
-                        label: '饼状图',
-                        value: '4'
                     }]
                 },
-                series_list: []
+                series_list: [],
+                tableData: [{
+                    value: 'LSTM',
+                    Num_layers: '1',
+                    Hidden_size: '64',
+                    lr: '0.01',
+                    Batch_size: '20',
+                    optimizer: 'adam'
+                }, {
+                    value: 'fLSTM',
+                    Num_layers: '1',
+                    Hidden_size: '64',
+                    lr: '0.01',
+                    Batch_size: '20',
+                    optimizer: 'adam'
+                }, {
+                    value: 'MPA-LSTM',
+                    Num_layers: '1',
+                    Hidden_size: '64',
+                    lr: '0.01',
+                    Batch_size: '20',
+                    optimizer: 'adam'
+                }, {
+                    value: 'MPA-fLSTM',
+                    Num_layers: '1',
+                    Hidden_size: '64',
+                    lr: '0.01',
+                    Batch_size: '20',
+                    optimizer: 'adam'
+                }]
             }
         },
         computed: {},

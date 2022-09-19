@@ -2,16 +2,16 @@
     <div class="main">
         <el-row class="header">
             <div class="header-item">
-                选择训练数据源：
-                <el-select style="width:160px" v-model="form.origin" collapse-tags multiple placeholder="请选择">
+                数据源：
+                <el-select style="width:160px" v-model="form.origin" placeholder="请选择">
                     <el-option  v-for="item in form.origin_options" :key="item.value" :label="item.label"
                         :value="item.value">
                     </el-option>
                 </el-select>
             </div>
             <div class="header-item">
-                剔除参数：
-                <el-select style="width:160px" v-model="form.params" collapse-tags multiple placeholder="请选择">
+                参数：
+                <el-select style="width:160px" v-model="form.params" placeholder="请选择">
                     <el-option  v-for="item in form.params_options" :key="item.value" :label="item.label"
                         :value="item.value">
                     </el-option>
@@ -27,9 +27,9 @@
                 </div>
             </div>
             <div class="header-item">
-                填充方法：
-                <el-select style="width:180px" v-model="form.chart_type" collapse-tags multiple placeholder="请选择">
-                    <el-option v-for="item in form.chart_options" :key="item.value" :label="item.label" :value="item.value">
+                处理方式：
+                <el-select style="width:180px" v-model="form.fun" placeholder="请选择">
+                    <el-option v-for="item in form.fun_options" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
                 </el-select>
             </div>
@@ -41,7 +41,7 @@
                 </el-select>
             </div>
             <div class="header-item">
-                <el-button type="primary" @click="getCharts">查询</el-button>
+                <el-button type="primary" @click="getAbnCharts">查询</el-button>
             </div>
         </el-row>
         <el-row class="content">
@@ -67,24 +67,49 @@
 <script>
     import * as echarts from 'echarts';
     import {
-        getNoMenu,getParamsMenu,getBaseChartByParam
+        getNoMenu,getParamsMenu,getKnnChart,getAbnChart
     } from '../../utils/request';
     export default {
         name: "AbnormalData",
         components: {},
         data() {
             return {
-                paramsText: '',
-                tree_data: [],
+                // paramsText: '',
+                // tree_data: [],
                 form: {
                     origin: '',
                     origin_options: [{
-                        label: '兰州铝业',
-                        value: '兰州铝业'
+                        label: 'KNN-兰铝',
+                        value: 'KNN-兰铝'
+                    },{
+                        label: '线性插值-兰铝',
+                        value: '线性插值-兰铝'
+                    },{
+                        label: '均值-兰铝',
+                        value: '均值-兰铝'
+                    },{
+                        label: '最大值-兰铝',
+                        value: '最大值-兰铝'
+                    },{
+                        label: '最小值-兰铝',
+                        value: '最小值-兰铝'
                     }],
                     params: '',
                     params_options: [],
                     date: '',
+                    fun: '',
+                    fun_options: [{
+                        label: '上阈值',
+                        value: '1'
+                    },
+                    {
+                        label: '下阈值',
+                        value: '2'
+                    },
+                    {
+                        label: '前后点均值',
+                        value: '3'
+                    }],
                     chart_type: '',
                     chart_options: [{
                         label: '折线图',
@@ -111,17 +136,17 @@
             this.getNoMenuData();
         },
         watch: {
-            paramsText(val) {
-                this.$refs.tree.filter(val);
-            }
+            // paramsText(val) {
+            //     this.$refs.tree.filter(val);
+            // }
         },
         methods: {
             getNoMenuData() {
-                getNoMenu().then((res) => {
-                    if (res.code === 200) {
-                        this.tree_data = res.data;
-                    }
-                })
+                // getNoMenu().then((res) => {
+                //     if (res.code === 200) {
+                //         this.tree_data = res.data;
+                //     }
+                // })
                 getParamsMenu().then((res) => {
                     if (res.code === 200) {
                         this.form.params_options = res.data;
@@ -135,23 +160,25 @@
                 if (!value) return true;
                 return data.label.indexOf(value) !== -1;
             },
-            getCharts() {
-                var code_arr = this.$refs['tree'].getCheckedNodes().map((item) => {return item.value})
-                // var params = {
-                //     code: code_arr.toString(),
-                //     params: this.form.params.toString(),
-                //     date: this.form.date.toString(),
-                //     chart: this.form.chart_type.toString()
-                // }
-                var params = {
-                    "code": "0,3039,3040,3041,3042,3043,3044,3045,3046,3047,3048,3049,3050,3051,3052,3053,3054,3055,3056,3057,3058,3059,3060,3061,3062,3063,3064,3065,3066,3067,3068,3069,3070,3071,3072,3073,3074,3075,3076",
-                    "params": "FZB,CLL,YHLND",
-                    "date": "2021-02-01,2021-05-01",
-                    "chart": "1"
+            getAbnCharts() {
+                let code_arr = ['兰州铝业电解铝板块二厂(200kA)三车间二工区3039#电解槽']
+                var that = this;
+                if(this.form.params==="") {
+                    that.$message.warning('请选择参数')
+                    return
                 }
-                console.log(params);
+                var params = {
+                    params: this.form.params,
+                    date: this.form.date.toString(),
+                    chart: this.form.chart_type.toString()
+                }
+                // var params = {
+                //     "params": "FZB,CLL,YHLND",
+                //     "date": "2021-02-01,2021-05-01",
+                //     "chart": "1"
+                // }
                 this.series_list = []
-                getBaseChartByParam(params).then((res) => {
+                getAbnChart(params).then((res) => {
                     if(res.code === 200) {
                         let resdata = res.data;
                         var html = ''
@@ -160,7 +187,7 @@
                             code_arr.forEach(code_i => {
                                 var series_i = []
                                 res_i.data.forEach((data_i) => {
-                                    if(code_i === data_i.code) {
+                                    if(code_i === data_i.body) {
                                         series_i.push([data_i.time, parseFloat(data_i.value)])
                                     }
                                 })
