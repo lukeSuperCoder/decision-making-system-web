@@ -69,19 +69,19 @@
       {
         "entity": {
           "alias": "互相关分析",
-          "name": "CharacteristicEngineering",
+          "name": "CrossAnalysis",
           "icon": "el-icon-user",
           "id": 3,
-          "value": "/CharacteristicEngineering"
+          "value": "/CrossAnalysis"
         }
       },
       {
         "entity": {
           "alias": "特征选取",
-          "name": "CharacteristicEngineering",
+          "name": "FeaturesSelect",
           "icon": "el-icon-user",
           "id": 3,
-          "value": "/CharacteristicEngineering"
+          "value": "/FeaturesSelect"
         }
       }
     ]
@@ -98,19 +98,19 @@
       {
         "entity": {
           "alias": "决策模型训练",
-          "name": "ModelApplication",
+          "name": "ModelPracitce",
           "icon": "el-icon-user",
           "id": 5,
-          "value": "/ModelApplication"
+          "value": "/ModelPracitce"
         }
       },
       {
         "entity": {
           "alias": "决策模型应用",
-          "name": "ModelApplication",
+          "name": "ModelApp",
           "icon": "el-icon-user",
           "id": 5,
-          "value": "/ModelApplication"
+          "value": "/ModelApp"
         }
       }
     ]
