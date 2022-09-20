@@ -199,7 +199,16 @@
                                     areaStyle: {
                                         opacity: 0
                                     },
-                                    data: series_i
+                                    data: series_i,
+                                    markLine: {
+                                        data: [{
+                                            name: '上阈值',
+                                            yAxis: 10
+                                        },{
+                                            name: '下阈值',
+                                            yAxis: 50
+                                        }]
+                                    }
                                 })
                             });
                             this.series_list.push({
