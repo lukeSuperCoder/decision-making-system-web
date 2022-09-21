@@ -13,9 +13,9 @@
         <el-row class="header" style="margin-top:15px">
             <div class="header-item">
                 参数设置：
-                Num_layers：<el-input style="width:150px"></el-input>
-                Hidden_size：<el-input style="width:150px"></el-input>
-                lr：<el-input style="width:150px"></el-input>
+                Num_layers：<el-input style="width:150px" v-model="form.params_set[0]"></el-input>
+                Hidden_size：<el-input style="width:150px" v-model="form.params_set[1]"></el-input>
+                lr：<el-input style="width:150px" v-model="form.params_set[2]"></el-input>
             </div>
         </el-row>
         <el-row class="header" style="margin-top:15px">
@@ -87,6 +87,7 @@
                     }],
                     params: '',
                     params_options: [],
+                    params_set: [10,1,0.1],
                     date: '',
                     chart_type: '',
                     chart_options: [{
