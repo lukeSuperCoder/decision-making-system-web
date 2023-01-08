@@ -21,6 +21,16 @@
 2.  npm run bulid
 3.  npm run lint
 
+#### 本项目使用说明
+
+1.  npm run serve
+2.  提交代码需要如下三步
+    git add .
+    git commit -m "简要描述要提交的代码内容"
+    git push origin master 
+3.  拉取代码
+    git pull
+
 #### 参与贡献
 
 1.  Fork 本仓库
