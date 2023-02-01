@@ -9,7 +9,7 @@
                 </el-select>
             </div>
             <div class="header-item">
-                优化：
+                参数优化算法：
                 <el-select style="width:180px" v-model="form.origin" collapse-tags multiple placeholder="请选择">
                     <el-option v-for="item in form.origin_options" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
@@ -106,7 +106,7 @@
                         value: '1'
                     },
                     {
-                        label: 'fLSTM',
+                        label: 'dfLSTM',
                         value: '2'
                     }]
                 },
@@ -119,7 +119,7 @@
                     Batch_size: '20',
                     optimizer: 'adam'
                 }, {
-                    value: 'fLSTM',
+                    value: 'dfLSTM',
                     Num_layers: '1',
                     Hidden_size: '64',
                     lr: '0.01',
@@ -128,15 +128,29 @@
                 }, {
                     value: 'MPA-LSTM',
                     Num_layers: '1',
-                    Hidden_size: '64',
+                    Hidden_size: '128',
                     lr: '0.01',
                     Batch_size: '20',
                     optimizer: 'adam'
                 }, {
-                    value: 'MPA-fLSTM',
+                    value: 'MPA-dfLSTM',
                     Num_layers: '1',
-                    Hidden_size: '64',
-                    lr: '0.01',
+                    Hidden_size: '128',
+                    lr: '0.01030531',
+                    Batch_size: '20',
+                    optimizer: 'adam'
+                }, {
+                    value: 'TF-MPA-LSTM',
+                    Num_layers: '1',
+                    Hidden_size: '32',
+                    lr: '0.02547853',
+                    Batch_size: '20',
+                    optimizer: 'adam'
+                }, {
+                    value: 'TF-MPA-dfLSTM',
+                    Num_layers: '1',
+                    Hidden_size: '128',
+                    lr: '0.02961708',
                     Batch_size: '20',
                     optimizer: 'adam'
                 }]
