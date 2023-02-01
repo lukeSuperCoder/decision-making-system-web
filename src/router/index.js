@@ -89,6 +89,12 @@ const routes = [
         meta: {},
         component: () => import("../views/SystemSettings/SystemSettings.vue"),
       },
+      {
+        path: "/UserManagement",
+        name: "UserManagement",
+        meta: {},
+        component: () => import("../views/SystemManagement/UserManagement.vue"),
+      }
     ],
   },
   {

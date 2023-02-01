@@ -17,9 +17,25 @@ export function systemLogin(params) {
  */
 export function getUserInfo(params) {
   return Service({
-    url: "/upms/sysUser",
+    url: "/api/getusers",
     method: "get",
     params: params,
+  });
+}
+
+export function editUserInfo(params) {
+  return Service({
+    url: "/api/editusers",
+    method: "post",
+    data: params,
+  });
+}
+
+export function InsertUserInfo(params) {
+  return Service({
+    url: "/api/insertuser",
+    method: "post",
+    data: params,
   });
 }
 
@@ -51,8 +67,9 @@ export function updateUserInfo(params) {
  */
 export function deleteUserInfo(params) {
   return Service({
-    url: "/upms/sysUser/" + params.userId,
-    method: "delete",
+    url: "/api/deleteuser",
+    method: "get",
+    params: params
   });
 }
 /**

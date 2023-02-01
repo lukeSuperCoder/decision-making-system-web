@@ -1,206 +1,239 @@
 <template>
   <div class="managementCls">
-
+    <div class="header">
+      <el-input style="width: 15rem;" v-model="username" placeholder="请输入用户名"></el-input>
+      <el-button type="primary" icon="el-icon-search"  @click="getUserData"></el-button>
+    </div>
+    <div class="header-btn">
+      <el-button type="primary" size="medium" icon="el-icon-plus" @click="openInsertUser">新增</el-button>
+      <!-- <el-button type="primary" size="medium" icon="el-icon-delete">删除</el-button> -->
+    </div>
+    <div class="table">
+      <el-table :data="tableData" style="width: 100%">
+        <el-table-column
+      type="selection"
+      width="55">
+      </el-table-column>
+        <el-table-column width="80" label="序号" sortable type="index">
+        </el-table-column>
+        <el-table-column prop="id" label="用户ID" sortable>
+        </el-table-column>
+        <el-table-column prop="username" label="用户名" sortable>
+        </el-table-column>
+        <el-table-column prop="likename" sortable label="昵称">
+        </el-table-column>
+        <el-table-column prop="email" label="邮箱" sortable>
+        </el-table-column>
+        <el-table-column prop="state" label="状态" sortable>
+          <template slot-scope="scope">
+            <el-button v-if="scope.row.state===0" type="primary" size="mini">激活</el-button>
+            <el-button v-else size="mini">未激活</el-button>
+          </template>
+        </el-table-column>
+        <el-table-column prop="issuper" sortable label="超级用户">
+          <template slot-scope="scope">
+            <el-switch v-model="is_super_state" active-text="是" inactive-text="否">
+            </el-switch>
+          </template>
+        </el-table-column>
+        <el-table-column prop="createtime" label="创建时间" sortable>
+        </el-table-column>
+        <el-table-column prop="lasttime" label="最后修改时间" sortable>
+        </el-table-column>
+        <el-table-column prop="address" label="角色权限">
+        </el-table-column>
+        <el-table-column label="操作" width="220px">
+          <template slot-scope="scope">
+            <el-button type="primary" icon="el-icon-edit" size="mini" @click="openEditUser(scope.row)"></el-button>
+            <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteUser(scope.row)"></el-button>
+            <!-- <el-button type="primary" icon="el-icon-edit" size="mini" @click="editUser"></el-button> -->
+            <!-- <el-button type="danger" icon="el-icon-delete" size="mini" @click="editUser"></el-button> -->
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+    <div class="pagediv">
+      <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageNo"
+        :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper"
+        :total="total">
+      </el-pagination>
+    </div>
+    <el-dialog
+      title="修改用户"
+      :visible.sync="edit_dialogVisible"
+      width="40%"
+      :modal-append-to-body="false"
+    >
+      <el-form label-position="right" label-width="80px" :model="user_form">
+        <el-form-item label="用户ID">
+          <el-input v-model="user_form.userno"></el-input>
+        </el-form-item>
+        <el-form-item label="用户名">
+          <el-input v-model="user_form.username"></el-input>
+        </el-form-item>
+        <el-form-item label="昵称">
+          <el-input v-model="user_form.likename"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱">
+          <el-input v-model="user_form.email"></el-input>
+        </el-form-item>
+    </el-form>
+    <span slot="footer" class="dialog-footer">
+      <el-button @click="edit_dialogVisible = false">取 消</el-button>
+      <el-button type="primary" @click="editUser">确 定</el-button>
+    </span>
+    </el-dialog>
+    <el-dialog
+      title="新增用户"
+      :visible.sync="insert_dialogVisible"
+      width="40%"
+      :modal-append-to-body="false"
+    >
+      <el-form label-position="right" label-width="80px" :model="user_form">
+        <el-form-item label="用户ID">
+          <el-input v-model="user_form.userno"></el-input>
+        </el-form-item>
+        <el-form-item label="用户名">
+          <el-input v-model="user_form.username"></el-input>
+        </el-form-item>
+        <el-form-item label="昵称">
+          <el-input v-model="user_form.likename"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱">
+          <el-input v-model="user_form.email"></el-input>
+        </el-form-item>
+    </el-form>
+    <span slot="footer" class="dialog-footer">
+      <el-button @click="insert_dialogVisible = false">取 消</el-button>
+      <el-button type="primary" @click="insertUser">确 定</el-button>
+    </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { getUserInfo, deleteUserInfo } from "../../utils/request";
-import NewUserInfo from "./NewUserInfo.vue";
-import dateUtil from "../../utils/dateUtil";
-export default {
-  name: "UserManagement",
-  components: { NewUserInfo },
-  data() {
-    return {
-      tableData: [],
-      pageNo: 1,
-      pageSize: 10,
-      total: 3,
-      showNewAdd: 1,
-      rowData: null,
-      title: "",
-      formInline: {
-        selectTime: "",
-        userName:''
-      },
-      
-      pickerOptions: {
-          shortcuts: [{
-            text: this.$t('lang.common.nearWeek'),
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-              picker.$emit('pick', [start, end]);
-            }
-          }, {
-            text: this.$t('lang.common.nearMonth'),
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-              picker.$emit('pick', [start, end]);
-            }
-          }, {
-            text: this.$t('lang.common.nearThMoth'),
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-              picker.$emit('pick', [start, end]);
-            }
-          }]
-        },
-    };
-  },
-  computed: {},
-  mounted() {
-    this.getUserInfoData();
-  },
-  methods: {
-    getUserInfoData: function () {
-      let that = this;
-      let params = {
-        pageNo: this.pageNo,
-        pageSize: this.pageSize,
+  import {
+    getUserInfo,
+    deleteUserInfo,
+    editUserInfo,
+    InsertUserInfo
+  } from "../../utils/request";
+  export default {
+    name: "UserManagement",
+    data() {
+      return {
+        username: '',
+        tableData: [],
+        pageNo: 1,
+        pageSize: 10,
+        total: 0,
+        is_super_state: false,
+        current_select_user: {},
+        edit_dialogVisible: false,
+        insert_dialogVisible: false,
+        user_form: {
+          userno: '',
+          username: '',
+          likename: '',
+          email: '',
+        }
       };
-      if (this.formInline.selectTime) {
-        params['startTime'] = dateUtil.formatDateYmdhms(new Date(this.formInline.selectTime[0]));
-        params['endTime'] = dateUtil.formatDateYmdhms(new Date(this.formInline.selectTime[1]));
-      }
-      if (this.formInline.userName) {
-        params['userName'] = this.formInline.userName;
-      }
-      getUserInfo(params)
-        .then((response) => {
-          if (response["code"] === 0) {
-            let data = response["data"]["records"];
-            data.forEach((item) => {
-              if (item.roleList.length > 0) {
-                item.roleNames = item.roleList[0].roleName;
-                item.roleId = item.roleList[0].roleId;
-              }
-            });
-            this.tableData = data;
-            that.total = response["data"]["total"];
-          } else {
-            that.$message.warning("获取用户信息失败！");
+    },
+    computed: {},
+    mounted() {
+      this.getUserData();
+    },
+    methods: {
+      getUserData() {
+        getUserInfo({name: this.username}).then((res) => {
+          if (res.code === 200) {
+            this.tableData = res.data;
+            this.total = res.data.length;
           }
         })
-        .catch(() => {
-          this.$message.warning("获取用户信息失败！");
-        });
-    },
-    passWordFormatter(row) {
-      // if (this.Rsa.decrypt(row.password)) {
-      //   return this.Rsa.decrypt(row.password);
-      // } else {
-        return row.password;
-      // }
-    },
-    thCls() {
-      return "thCls";
-    },
-    tdCls() {
-      return "tdCls";
-    },
-    tableRowClassName({ row, rowIndex }) {
-      if (rowIndex % 2 === 0) {
-        return "warning-row";
-      } else if (rowIndex % 2 === 1) {
-        return "success-row";
-      }
-      return "";
-    },
-    handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
-      this.pageSize = val;
-      // 重新请求接口数据
-      this.getUserInfoData();
-    },
-    handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
-      this.pageNo = val;
-      // 请求当前页接口数据
-      this.getUserInfoData();
-    },
-    AddUserHandle() {
-      this.title = "新建";
-      this.showNewAdd = 2;
-    },
-    handleClick: function (data, type) {
-      if (type === "look") {
-        // 查看
-        this.title = this.$t('lang.common.look');
-        this.rowData = data;
-        this.showNewAdd = 2;
-      }
-      if (type === "edit") {
-        // 编辑
-        this.title = this.$t('lang.common.edit');
-        this.rowData = data;
-        this.showNewAdd = 2;
-      }
-      if (type === "delete") {
-        // 删除
-        let params = {
-          userId: data.userId,
-        };
-        this.$confirm("此操作将永久删除该条信息, 是否继续?", "提示", {
-          confirmButtonText: this.$t('lang.common.ok'),
-          cancelButtonText: this.$t('lang.common.cancel'),
-          cancelButtonClass: "btn-custom-cancel",
-          type: "warning",
+      },
+      openInsertUser() {
+        this.user_form = {
+              userno: '',
+              username: '',
+              likename: '',
+              email: ''
+            }
+        this.insert_dialogVisible =true;
+      },
+      insertUser() {
+        InsertUserInfo(this.user_form).then((res) => {
+          if(res.code===200) {
+            this.$message.success('新增成功')
+            this.insert_dialogVisible =false;
+            this.getUserData();
+
+          }
         })
-          .then(() => {
-            deleteUserInfo(params)
-              .then((response) => {
-                if (response["code"] === 0) {
-                  this.getUserInfoData();
-                  this.$message({
-                    type: "success",
-                    message: "删除成功!",
-                  });
-                } else {
-                  this.$message.warning("删除用户信息失败！");
-                }
-              })
-              .catch(() => {
-                this.$message.warning("删除用户信息失败！");
-              });
-          })
-          .catch(() => {
-            this.$message({
-              type: "info",
-              message: "已取消删除",
-            });
-          });
+      },
+      openEditUser(row) {
+        this.current_select_user = row;
+        this.user_form = row;
+        this.edit_dialogVisible =true;
+      },
+      editUser() {
+        editUserInfo(this.user_form).then((res) => {
+          if (res.code === 200) {
+            this.$message.success('修改成功')
+            this.edit_dialogVisible =false;
+            this.user_form = {
+              userno: '',
+              username: '',
+              likename: '',
+              email: ''
+            }
+          } else {
+            this.$message.error('修改失败')
+          }
+        })
+      },
+      deleteUser(row) {
+        deleteUserInfo(row).then((res) => {
+          if(res.code===200) {
+            this.$message.success('删除成功')
+            this.getUserData();
+          }
+        })
+      },
+      handleSizeChange() {
+
+      },
+      handleCurrentChange() {
+
       }
-    }
-  },
-};
+    },
+  };
 </script>
 
 <style scoped lang="scss">
-.fixeds {
-  height: 15px;
-  font-size: 16px;
-  font-weight: 500;
-  color: #42a4ef;
-}
-.btnCls {
-  background: #45b2e0;
-  border-radius: 4px;
-  color: white;
-}
-.eltable {
-  //margin-left: 22px;
-  padding-left: 20px;
-  padding-right: 20px;
-  //width: 100%;
-}
-.managementCls ::v-deep {
-  
-}
+  .managementCls ::v-deep {
+    width: 100%;
+    height: 100%;
+
+    .header {
+      display: flex;
+      align-items: center;
+      height: 4rem;
+
+      .el-input__inner {
+        border-radius: 0
+      }
+    }
+    .header-btn {
+      display: flex;
+    }
+    .table {
+      height: 50rem;
+    }
+
+    .pagediv {
+      height: 5rem;
+      display: flex;
+    }
+  }
 </style>
