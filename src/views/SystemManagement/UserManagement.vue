@@ -6,17 +6,17 @@
     </div>
     <div class="header-btn">
       <el-button type="primary" size="medium" icon="el-icon-plus" @click="openInsertUser">新增</el-button>
-      <!-- <el-button type="primary" size="medium" icon="el-icon-delete">删除</el-button> -->
+      <el-button type="primary" size="medium" icon="el-icon-delete">删除</el-button>
     </div>
     <div class="table">
-      <el-table :data="tableData" style="width: 100%">
+      <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange" @cell-mouse-enter="setUser">
         <el-table-column
       type="selection"
       width="55">
       </el-table-column>
         <el-table-column width="80" label="序号" sortable type="index">
         </el-table-column>
-        <el-table-column prop="id" label="用户ID" sortable>
+        <el-table-column prop="userno" label="用户ID" sortable>
         </el-table-column>
         <el-table-column prop="username" label="用户名" sortable>
         </el-table-column>
@@ -32,7 +32,7 @@
         </el-table-column>
         <el-table-column prop="issuper" sortable label="超级用户">
           <template slot-scope="scope">
-            <el-switch v-model="is_super_state" active-text="是" inactive-text="否">
+            <el-switch v-model="scope.row.issuper" active-value="0" inactive-value="1" active-text="是" inactive-text="否" @change="updateIsSuper">
             </el-switch>
           </template>
         </el-table-column>
@@ -89,7 +89,7 @@
       width="40%"
       :modal-append-to-body="false"
     >
-      <el-form label-position="right" label-width="80px" :model="user_form">
+      <el-form label-position="right" label-width="110px" :model="user_form">
         <el-form-item label="用户ID">
           <el-input v-model="user_form.userno"></el-input>
         </el-form-item>
@@ -101,6 +101,17 @@
         </el-form-item>
         <el-form-item label="邮箱">
           <el-input v-model="user_form.email"></el-input>
+        </el-form-item>
+        <el-form-item label="密码">
+          <el-input  show-password v-model="user_form.password"></el-input>
+        </el-form-item>
+        <el-form-item label="是否为超级用户" style="display: flex;">
+          <el-switch
+            style="margin-left: -120px"
+            v-model="user_form.issuper"
+            active-text="是"
+            inactive-text="否">
+          </el-switch>
         </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -124,6 +135,7 @@
       return {
         username: '',
         tableData: [],
+        multipleSelection: [],
         pageNo: 1,
         pageSize: 10,
         total: 0,
@@ -171,8 +183,18 @@
           }
         })
       },
+      setUser(row) {
+        console.log(row);
+        this.user_form = row;
+      },
+      updateIsSuper(val) {
+        var that = this
+        this.user_form.issuper = val
+        setTimeout(()=> {
+          that.editUser();
+        },1000)
+      },
       openEditUser(row) {
-        this.current_select_user = row;
         this.user_form = row;
         this.edit_dialogVisible =true;
       },
@@ -187,6 +209,7 @@
               likename: '',
               email: ''
             }
+            // this.getUserData();
           } else {
             this.$message.error('修改失败')
           }
@@ -205,6 +228,9 @@
       },
       handleCurrentChange() {
 
+      },
+      handleSelectionChange(val) {
+        this.multipleSelection = val;
       }
     },
   };
