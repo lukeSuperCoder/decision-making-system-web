@@ -3,7 +3,7 @@
         <el-row class="header">
             <div class="header-item">
                 选择训练数据源：
-                <el-select style="width:160px" v-model="form.origin" collapse-tags multiple placeholder="请选择">
+                <el-select style="width:110px" v-model="form.origin" collapse-tags multiple placeholder="请选择">
                     <el-option  v-for="item in form.origin_options" :key="item.value" :label="item.label"
                         :value="item.value">
                     </el-option>
