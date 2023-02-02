@@ -92,21 +92,28 @@ export default {
     dataFormSubmit: async function () {
       this.$refs["dataForm"].validate(async (valid) => {
         if (valid) {
-          // const { code, data,msg,error } = await systemLogin(this.dataForm);
-          // if (code === 0) {
-          //   //模拟设置token
-          //   sessionSet("token", data['token']);
-          //   sessionSet("userName", data['userName']);
-          //   sessionSet("deptName", data['deptName']);
-          //   sessionSet("roleList", JSON.stringify(data['roleList']));
-          //   sessionSet("roleId", data['roleList'][0]['roleId']);
-          //   sessionSet("userId", data['userId']);
-          //   //处理登录相关逻辑
-          //   this.$router.replace({ name: "Home" });
-          // } else {
-          //   this.$message.warning(msg?msg:error);
-          // }
-          this.$router.replace({ name: "Home" });
+          var params = {
+            username: this.dataForm.loginName,
+            password: this.dataForm.password
+          }
+          const { code, data,msg,error } = await systemLogin(params);
+          if (code === 200) {
+            console.log(data);
+            //模拟设置token
+            // sessionSet("token", data['token']);
+            sessionSet("userName", data[0]['username']);
+            sessionSet("state", data[0]['state']);
+            sessionSet("issuper", data[0]['issuper']);
+            // sessionSet("deptName", data['deptName']);
+            // sessionSet("roleList", JSON.stringify(data['roleList']));
+            // sessionSet("roleId", data['roleList'][0]['roleId']);
+            // sessionSet("userId", data['userId']);
+            //处理登录相关逻辑
+            this.$router.replace({ name: "Home" });
+          } else {
+            this.$message.error('用户名或密码错误');
+          }
+          // this.$router.replace({ name: "Home" });
         }
       });
     },

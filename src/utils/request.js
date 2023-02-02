@@ -6,7 +6,7 @@ import { Service } from "../plugins/axios";
  */
 export function systemLogin(params) {
   return Service({
-    url: "/upms/sysUser/login",
+    url: "/api/login",
     method: "post",
     data: params,
   });
@@ -70,6 +70,17 @@ export function deleteUserInfo(params) {
     url: "/api/deleteuser",
     method: "get",
     params: params
+  });
+}
+/**
+ * 删除多个用户信息
+ * @param params
+ */
+ export function deleteUserById(params) {
+  return Service({
+    url: "/api/deleteuserid",
+    method: "post",
+    data: params
   });
 }
 /**

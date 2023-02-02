@@ -11,19 +11,15 @@
           <span class="timer">{{ currentTime }}</span>
           <div class="sxwCls">{{ $t(weekDay) + "&emsp;" + $t(sxw) }}</div>
         </div>
-        <!-- <div>
+        <div>
           <div class="rightHeader">
-            <img class="imgCls" src="../assets/image/home/user.png" />
+            <!-- <img class="imgCls" src="../assets/image/home/user.png" /> -->
+            <i class="el-icon-user" @click="logout"></i>
             <a class="username">{{ name }}</a>
           </div>
           <div class="uCls">{{ userName }}</div>
-        </div> -->
-        <!-- <img
-          src="../assets/image/home/logout1.png"
-          :alt="$t('lang.home.logOut')"
-          :title="$t('lang.home.logOut')"
-          @click="logout"
-        /> -->
+        </div>
+        <i class="el-icon-switch-button" @click="logout"></i>
       </el-header>
       <el-container>
         <el-aside class="aside-iscollapse" id="el-aside" v-show="isCollapse">
