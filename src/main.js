@@ -10,9 +10,11 @@ import VueI18n from "vue-i18n";
 import Rsa from "../src/utils/rsa.js";
 import { checkPermission } from "./utils/common";
 import echarts from "echarts";
+import JsonExcel from "vue-json-excel";
 Vue.prototype.$echarts = echarts;
 Vue.prototype.Rsa = Rsa; // 将Rsa注册为公共方法,方便其他页面调用
 Vue.use(VueI18n);
+Vue.component("downloadExcel", JsonExcel);
 
 const i18n = new VueI18n({
   locale: "zh-CN", // 语言标识, 通过切换locale的值来实现语言切换,this.$i18n.locale

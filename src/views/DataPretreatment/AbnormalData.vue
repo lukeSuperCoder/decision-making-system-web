@@ -66,6 +66,7 @@
 
 <script>
     import * as echarts from 'echarts';
+    import { sessionGet, sessionSet } from "../../utils/auth";
     import {
         getNoMenu,getParamsMenu,getKnnChart,getAbnChart
     } from '../../utils/request';
@@ -85,8 +86,8 @@
                         label: '线性插值-兰铝',
                         value: '线性插值-兰铝'
                     },{
-                        label: '均值-兰铝',
-                        value: '均值-兰铝'
+                        label: '均值法-兰铝',
+                        value: '均值法-兰铝'
                     },{
                         label: '最大值-兰铝',
                         value: '最大值-兰铝'
@@ -134,6 +135,9 @@
         computed: {},
         mounted() {
             this.getNoMenuData();
+            var data = JSON.parse(sessionGet('formdata'));
+            this.form.origin = data.fun_data;
+            this.form.date = data.date;
         },
         watch: {
             // paramsText(val) {

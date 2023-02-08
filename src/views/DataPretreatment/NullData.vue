@@ -40,8 +40,18 @@
                     </el-option>
                 </el-select>
             </div>
-            <div class="header-item">
-                <el-button type="primary" @click="getKnnCharts">查询</el-button>
+            <div class="header-item" style="display: flex; height: 50%; align-items: center;">
+                <el-button type="primary" @click="getKnnCharts">执行</el-button>
+                <el-button type="primary" @click="setloadData">载入</el-button>
+                <download-excel  
+                    :data="json_data"
+                    :fields="json_fields"
+                    worksheet="My Worksheet"
+                    name="filename.xls"
+                    >
+                    <el-button type="primary" style="height:100%;margin-left: 10px;">保存</el-button>
+                    </download-excel>
+                <!-- <el-button type="primary" @click="downloadData">保存</el-button> -->
             </div>
         </el-row>
         <el-row class="content">
@@ -69,6 +79,8 @@
     import {
         getNoMenu,getParamsMenu,getKnnChart
     } from '../../utils/request';
+    import { sessionGet, sessionSet, sessionDel } from "../../utils/auth";
+
     export default {
         name: "AbnormalData",
         components: {},
@@ -123,12 +135,46 @@
                         value: '4'
                     }]
                 },
-                series_list: []
+                series_list: [],
+                json_fields: {              //表头设计
+                    "全名": "name",
+                    "城市": "city",
+                    "电话1": "phone.mobile",
+                    "电话2": {
+                    field: "phone.landline",
+                    callback: (value) => {   //电话2这一列通过一个回调函数格式化了该列数据
+                        return `Landline Phone - ${value}`;
+                    },
+                    },
+                },
+                json_data: [               //表格数据
+                    {
+                    name: "Tony Peña",
+                    city: "New York",
+                    country: "United States",
+                    birthdate: "1978-03-15",
+                    phone: {
+                        mobile: "1-541-754-3010",
+                        landline: "(541) 754-3010",
+                    },
+                    },
+                    {
+                    name: "Thessaloniki",
+                    city: "Athens",
+                    country: "Greece",
+                    birthdate: "1987-11-23",
+                    phone: {
+                        mobile: "+1 855 275 5071",
+                        landline: "(2741) 2621-244",
+                    },
+                    },
+                ],
             }
         },
         computed: {},
         mounted() {
             this.getNoMenuData();
+            sessionDel('formdata')
         },
         watch: {
             // paramsText(val) {
@@ -154,6 +200,19 @@
             filterNode(value, data) {
                 if (!value) return true;
                 return data.label.indexOf(value) !== -1;
+            },
+            setloadData() {
+                this.$message.success('载入成功')
+                this.form.fun_options.forEach((item) => {
+                    if(this.form.fun === item.value) {
+                        this.form.fun_data = item.label+'-兰铝'
+                        return
+                    }
+                })
+                sessionSet('formdata', JSON.stringify(this.form))
+            },
+            downloadData() {
+
             },
             getKnnCharts() {
                 let code_arr = ['兰州铝业电解铝板块二厂(200kA)三车间二工区3039#电解槽']
