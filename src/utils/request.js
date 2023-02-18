@@ -270,3 +270,34 @@ export function updateAndDelMenu(params) {
     data: params
   });
 }
+
+/**
+ * 获取加载数据
+ * @param params
+ */
+ export function getLoad(params) {
+  return Service({
+    url: "/api/getload",
+    method: "get",
+    params: params
+  });
+}
+
+/**
+ * 获取加载数据
+ * @param params
+ */
+ export function setLoad(params) {
+  return Service({
+    url: "/api/setload",
+    method: "post",
+    data: params
+  });
+}
+  export function deleteLoad(params) {
+    return Service({
+      url: "/api/deleteload",
+      method: "get",
+      params: params
+    });
+}
