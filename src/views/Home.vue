@@ -13,7 +13,7 @@
         </div>
         <div>
           <div class="rightHeader">
-            <!-- <img class="imgCls" src="../assets/image/home/user.png" /> -->
+            <img class="imgCls" src="../assets/image/home/user.png" />
             <i class="el-icon-user" @click="logout"></i>
             <a class="username">{{ name }}</a>
           </div>

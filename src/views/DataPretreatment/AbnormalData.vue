@@ -1,6 +1,6 @@
 <template>
     <div class="main">
-        <el-row class="header">
+        <el-row class="header"  style="border: 0; height: 40px;">
             <div class="header-item">
                 数据源：
                 <el-select style="width:160px" v-model="form.origin" placeholder="请选择" @change="getLoadData">
@@ -50,9 +50,13 @@
                     </el-option>
                 </el-select>
             </div>
+        </el-row>
+        <el-row class="header" style=" height: 40px;">
             <div class="header-item">
-                <el-button type="primary" @click="getKnnCharts">查询</el-button>
+                <el-button type="primary" @click="getKnnCharts">执行</el-button>
                 <el-button type="primary" @click="deleteAbnCharts">删除</el-button>
+                <el-button type="primary" @click="setloadData">载入</el-button>
+                <el-button type="primary" @click="deleteAbnCharts">保存</el-button>
             </div>
         </el-row>
         <el-row class="content">
@@ -97,7 +101,7 @@
     import * as echarts from 'echarts';
     import { sessionGet, sessionSet } from "../../utils/auth";
     import {
-        getNoMenu,getParamsMenu,getKnnChart,getAbnChart,getLoad,deleteLoad
+        getNoMenu,getParamsMenu,getKnnChart,getAbnChart,setLoad,getLoad,deleteLoad
     } from '../../utils/request';
     export default {
         name: "AbnormalData",
@@ -438,6 +442,26 @@
                 
                 // this.drawChart2();
                 // this.drawChart3();
+            },
+            setloadData() {
+                this.form.numbers = this.$refs['tree'].getCheckedKeys();
+                this.form.fun_options.forEach((item) => {
+                    if(this.form.fun === item.value) {
+                        this.form.fun_data = item.value
+                        var params = {
+                            start_time: this.form.date[0],
+                            end_time: this.form.date[1],
+                            name: this.form.origin+'_'+this.form.fun,
+                            numbers: this.form.numbers.toString()
+                        }
+                        setLoad(params).then((res) => {
+                            if(res.code===200) {
+                                this.$message.success('载入成功')
+                            }
+                        })  
+                    }
+                })
+                // sessionSet('formdata', JSON.stringify(this.form))
             },
             handleSizeChange(val) {
                 this.pageSize = val

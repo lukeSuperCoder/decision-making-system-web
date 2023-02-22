@@ -270,7 +270,17 @@ export function updateAndDelMenu(params) {
     data: params
   });
 }
-
+/**
+ * 获取Abnormal图表数据
+ * @param params
+ */
+ export function getHxgChart(params) {
+  return Service({
+    url: "/api/gethxgchart",
+    method: "post",
+    data: params
+  });
+}
 /**
  * 获取加载数据
  * @param params
@@ -283,6 +293,29 @@ export function updateAndDelMenu(params) {
   });
 }
 
+/**
+ * 获取值加载数据
+ * @param params
+ */
+ export function getValueLoad(params) {
+  return Service({
+    url: "/api/getvalueload",
+    method: "get",
+    params: params
+  });
+}
+
+/**
+ * 获取值加载数据
+ * @param params
+ */
+ export function getTzgc(params) {
+  return Service({
+    url: "/api/gettzgc",
+    method: "get",
+    params: params
+  });
+}
 /**
  * 获取加载数据
  * @param params

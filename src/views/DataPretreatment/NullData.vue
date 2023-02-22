@@ -257,7 +257,7 @@
                         })  
                     }
                 })
-                sessionSet('formdata', JSON.stringify(this.form))
+                // sessionSet('formdata', JSON.stringify(this.form))
             },
             downloadData() {
 
