@@ -13,15 +13,15 @@
                 槽号：
                 <el-popover popper-class="vmpopper" placement="bottom-start" width="450" trigger="click">
                     <el-tree ref="tree" :data="tree_data" show-checkbox node-key="value"
-                     :filter-node-method="filterNode">
+                     :filter-node-method="filterNode" @check-change="handleCheckChange">
                     </el-tree>
-                    <el-input style="width:120px" slot="reference" placeholder="输入关键字" v-model="paramsText">
+                    <el-input style="width:120px" slot="reference" :placeholder="InfoText" v-model="paramsText">
                     </el-input>
                 </el-popover>
             </div>
             <div class="header-item">
                 参数：
-                <el-select style="width:160px" v-model="form.params" multiple collapse-tags placeholder="请选择">
+                <el-select style="width:160px" v-model="form.params" placeholder="请选择">
                     <el-option  v-for="item in form.params_options" :key="item.value" :label="item.label"
                         :value="item.value">
                     </el-option>
@@ -51,12 +51,19 @@
                 </el-select>
             </div>
         </el-row>
-        <el-row class="header" style=" height: 40px;">
-            <div class="header-item">
+        <el-row class="header" style=" height: 60px;">
+            <div class="header-item"  style="display: flex; height: 50%; align-items: center;margin-top: 10px;">
                 <el-button type="primary" @click="getKnnCharts">执行</el-button>
                 <el-button type="primary" @click="deleteAbnCharts">删除</el-button>
                 <el-button type="primary" @click="setloadData">载入</el-button>
-                <el-button type="primary" @click="deleteAbnCharts">保存</el-button>
+                <download-excel  
+                    :data="json_data"
+                    :fields="json_fields"
+                    worksheet="My Worksheet"
+                    name="异常值处理数据.xls"
+                    >
+                    <el-button type="primary" style="height:100%;margin-left: 10px;">保存</el-button>
+                    </download-excel>
             </div>
         </el-row>
         <el-row class="content">
@@ -108,6 +115,7 @@
         components: {},
         data() {
             return {
+                InfoText: '请勾选槽号',
                 paramsText: '',
                 tree_data: [],
                 pageNo: 1,
@@ -180,7 +188,13 @@
                         value: '4'
                     }]
                 },
-                series_list: []
+                series_list: [],
+                json_fields: {              //表头设计
+                   
+                },
+                json_data: [               //表格数据
+
+                ],
             }
         },
         computed: {},
@@ -254,6 +268,12 @@
                 })
             },
             handleCheckChange() {
+                let arr = this.$refs['tree'].getCheckedKeys();
+                if(arr[0]==='0') {
+                    this.InfoText = arr.toString().substr(2)
+                } else {
+                    this.InfoText = arr.toString()
+                }
                 
             },
             filterNode(value, data) {
@@ -306,11 +326,23 @@
                 // that.form.params.forEach((j) => {
                 //     legend.splice(legend.indexOf(j),1)
                 // })
+                
                 if(that.form.params.length===0) {
                     that.$message.warning('至少保留一项参数')
                     return
                 }
-                this.table_column = that.form.params;
+                this.table_column = [that.form.params];
+                var str = '{"列表号":"list","槽号":"number","时间":"time",'
+                console.log(this.table_column);
+                this.table_column.forEach((i,index) => {
+                    if(index===this.table_column.length-1) {
+                        str+='"'+i+'":"'+i+'"'
+                    } else {
+                        str+='"'+i+'":"'+i+'",'
+                    }
+                })
+                str += '}'
+                this.json_fields = JSON.parse(str)
                 this.form.numbers = this.$refs['tree'].getCheckedKeys();
                 var params = {
                     numbers: this.form.numbers.toString(),
@@ -319,7 +351,8 @@
                     chart: this.form.chart_type,
                     pageNo: this.pageNo,
                     pageSize: this.pageSize,
-                    fun: this.form.origin+'_'+this.form.fun
+                    fun: this.form.origin+'_database',
+                    fun1: this.form.origin+'_'+this.form.fun
                 }
                 // var params = {
                 //     "params": "FZB,CLL,YHLND",
@@ -330,7 +363,7 @@
                 this.series_list = []
                 if(this.form.chart_type==='1') {
                     this.tableData_visible = false;
-                    getKnnChart(params).then((res) => {
+                    getAbnChart(params).then((res) => {
                         if(res.code === 200) {
                             let resdata = res.data;
                             var html = ''
@@ -340,7 +373,7 @@
                                     var series_i = []
                                     res_i.data.forEach((data_i) => {
                                         if(code_i === data_i.body) {
-                                            series_i.push([data_i.time, parseFloat(data_i.value)])
+                                            series_i.push([data_i.time, parseFloat(data_i.value).toFixed(3)])
                                         }
                                     })
                                     series.push({
@@ -351,7 +384,10 @@
                                         areaStyle: {
                                             opacity: 0
                                         },
-                                        data: series_i
+                                        data: series_i,
+                                        markLine: {
+                                            data: [{ type: 'min', name: '最小值' },{ type: 'max', name: '最大值' }]
+                                        }
                                     })
                                 });
                                 this.series_list.push({
@@ -367,7 +403,7 @@
                     })
                 } else if(this.form.chart_type==='2') {
                     this.tableData_visible = false;
-                    getKnnChart(params).then((res) => {
+                    getAbnChart(params).then((res) => {
                         if(res.code === 200) {
                             let resdata = res.data;
                             var html = ''
@@ -399,7 +435,7 @@
                     })
                 } else if(this.form.chart_type==='3') {
                     this.tableData_visible = false;
-                    getKnnChart(params).then((res) => {
+                    getAbnChart(params).then((res) => {
                         if(res.code === 200) {
                             let resdata = res.data;
                             var html = ''
@@ -434,6 +470,7 @@
                     getKnnChart(params).then((res) => {
                         if(res.code === 200) {
                             this.tableData = res.data;
+                            this.json_data = this.tableData;
                             this.tableData_visible = true;
                             this.total = res.total;
                         }

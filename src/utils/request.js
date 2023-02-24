@@ -281,6 +281,18 @@ export function updateAndDelMenu(params) {
     data: params
   });
 }
+
+/**
+ * 获取Abnormal图表数据
+ * @param params
+ */
+ export function getJcData(params) {
+  return Service({
+    url: "/api/getjcdata",
+    method: "post",
+    data: params
+  });
+}
 /**
  * 获取加载数据
  * @param params

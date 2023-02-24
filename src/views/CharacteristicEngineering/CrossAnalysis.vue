@@ -13,9 +13,9 @@
                 槽号：
                 <el-popover popper-class="vmpopper" placement="bottom-start" width="450" trigger="click">
                     <el-tree ref="tree" :data="tree_data" show-checkbox node-key="value"
-                        :filter-node-method="filterNode">
+                        :filter-node-method="filterNode" @check-change="handleCheckChange">
                     </el-tree>
-                    <el-input style="width:120px" slot="reference" placeholder="输入关键字" v-model="paramsText">
+                    <el-input style="width:120px" slot="reference" :placeholder="InfoText" v-model="paramsText">
                     </el-input>
                 </el-popover>
             </div>
@@ -64,7 +64,7 @@
             </div>
         </el-row> -->
         <el-row class="content">
-            <el-card class="card">
+            <el-card class="card"  v-if="series_list.length!==1">
                 <!-- <el-row type="flex" justify="center">
                     <div id="echart1" style="width: 100%; height: 400px"></div>
                 </el-row>
@@ -80,6 +80,10 @@
                 <div class="img-span" id="echart-crad">
                     <!-- <div class="img-item">
                     </div> -->
+                </div>
+            </el-card>
+            <el-card class="card"  v-else>
+                <div class="img-span1" id="echart-crad">
                 </div>
             </el-card>
         </el-row>
@@ -107,6 +111,7 @@
                 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg',
                 'https://fuss10.elemecdn.com/1/8e/aeffeb4de74e2fde4bd74fc7b4486jpeg.jpeg'
                 ],
+                InfoText: '请勾选槽号',
                 paramsText: '',
                 tree_data: [],
                 form: {
@@ -212,54 +217,55 @@
                     params1: '',
                     params2: '',
                     params_options: [],
-                    params_options1: [{
-                            "value": "槽控工艺报出铝量 (kg)",
+                    params_options1: [
+                        {
+                            "value": "CLL",
                             "label": "槽控工艺报出铝量 (kg)"
                         },
                         {
-                            "value": "槽控日报设定电压 (V)",
+                            "value": "SDDY",
                             "label": "槽控日报设定电压 (V)"
                         }
                     ],
                     params_options2: [
                         {
-                            "value": "槽控工艺报出铝量 (kg)",
+                            "value": "CLL",
                             "label": "槽控工艺报出铝量 (kg)"
                         },
                         {
-                            "value": "槽控工艺报分子比 (N/A)",
+                            "value": "FZB",
                             "label": "槽控工艺报分子比 (N/A)"
                         },
                         {
-                            "value": "槽控工艺报氧化铝浓度 (%)",
+                            "value": "YHLND",
                             "label": "槽控工艺报氧化铝浓度 (%)"
                         },
                         {
-                            "value": "槽控工艺报电解温度 (℃)",
+                            "value": "DJWD",
                             "label": "槽控工艺报电解温度 (℃)"
                         },
                         {
-                            "value": "槽控工艺报铝水平 (cm)",
+                            "value": "LSP",
                             "label": "槽控工艺报铝水平 (cm)"
                         },
                         {
-                            "value": "槽控日报下料次数 (次)",
+                            "value": "XLCS",
                             "label": "槽控日报下料次数 (次)"
                         },
                         {
-                            "value": "槽控日报工作电压 (V)",
+                            "value": "GZDY",
                             "label": "槽控日报工作电压 (V)"
                         },
                         {
-                            "value": "槽控日报平均电压 (V)",
+                            "value": "PJDY",
                             "label": "槽控日报平均电压 (V)"
                         },
                         {
-                            "value": "槽控日报设定电压 (V)",
+                            "value": "SDDY",
                             "label": "槽控日报设定电压 (V)"
                         },
                         {
-                            "value": "槽控日报针振 (mV)",
+                            "value": "ZZ",
                             "label": "槽控日报针振 (mV)"
                         }
                     ],
@@ -360,7 +366,12 @@
                 // })
             },
             handleCheckChange() {
-
+                let arr = this.$refs['tree'].getCheckedKeys();
+                if(arr[0]==='0') {
+                    this.InfoText = arr.toString().substr(2)
+                } else {
+                    this.InfoText = arr.toString()
+                }
             },
             filterNode(value, data) {
                 if (!value) return true;
@@ -421,7 +432,7 @@
             },
             getKnnCharts() {
                 var that = this;
-                var code_arr = "CLL_CLL,CLL_DJWD,CLL_FZB,CLL_GZDY,CLL_LSP,CLL_PJDY,CLL_SDDY,CLL_XLCS,CLL_YHLND,CLL_ZZ".split(',')
+                var code_arr = "all,CLL_CLL,CLL_DJWD,CLL_FZB,CLL_GZDY,CLL_LSP,CLL_PJDY,CLL_SDDY,CLL_XLCS,CLL_YHLND,CLL_ZZ,SDDY_CLL,SDDY_DJWD,SDDY_FZB,SDDY_GZDY,SDDY_LSP,SDDY_PJDY,SDDY_SDDY,SDDY_XLCS,SDDY_YHLND,SDDY_ZZ".split(',')
                 // let legend = ['槽控工艺报出铝量 (kg)','槽控日报设定电压 (V)','槽控工艺报铝水平 (cm)','槽控工艺报氧化铝浓度 (%)','槽控工艺报电解温度 (℃)',
                 // '槽控工艺报分子比 (N/A)','槽控日报工作电压 (V)','槽控日报平均电压 (V)','槽控日报下料次数 (次)','槽控日报针振 (mV)']
                 // that.form.params.forEach((j) => {
@@ -447,9 +458,19 @@
                 //     "date": "2021-02-01,2021-05-01",
                 //     "chart": "1"
                 // }
+                var str = this.form.origin.split('_')[0]+'-'+this.form.origin.split('_')[1]
                 var params = {
-                    "params": "CLL_CLL,CLL_DJWD,CLL_FZB,CLL_GZDY,CLL_LSP,CLL_PJDY,CLL_SDDY,CLL_XLCS,CLL_YHLND,CLL_ZZ",
-                    "fun": "jz-sxyz-hxg"
+                    "params": "",
+                    "fun": str+"-hxg"
+                }
+                if(this.form.params1.toString() === 'CLL,SDDY') {
+                    params.params = "all"
+                } else {
+                    let str_arr = []
+                    this.form.params2.forEach((item) => {
+                        str_arr.push(this.form.params1[0] + '_' + item)
+                    })
+                    params.params = str_arr.toString()
                 }
                 console.log(params);
                 this.series_list = []
@@ -464,8 +485,7 @@
                                 var series_i = []
                                 res_i.data.forEach((data_i) => {
                                     if (code_i === data_i.body) {
-                                        series_i.push([parseInt(data_i.time), parseFloat(data_i
-                                            .value)])
+                                        series_i.push([parseInt(data_i.time), parseFloat(data_i.value).toFixed(4)])
                                     }
                                 })
                                 series.push({
@@ -495,8 +515,17 @@
                                 name: res_i.name,
                                 data: series
                             });
-                            html = html +
+                            if(resdata.length===1) {
+                                html = html +
+                                `<el-row type="flex" justify="center"><div id="${res_i.name}" style="margin-top:100px; margin-left:400px; width:800px; height: 560px"></div></el-row>`  
+                            } else if(resdata.length===2){
+                                html = html +
+                                `<el-row type="flex" justify="center"><div id="${res_i.name}" style="margin-top:100px; width:800px; height: 560px"></div></el-row>`  
+                            } else {
+                                html = html +
                                 `<el-row type="flex" justify="center"><div id="${res_i.name}" style="height: 260px"></div></el-row>`
+                            }
+                            
                         })
                             console.log(this.series_list);
                             document.getElementById('echart-crad').innerHTML = html
@@ -544,16 +573,16 @@
                                 return value.max + 0.1;
                             },
                         },
-                        dataZoom: [{
-                                type: 'inside',
-                                start: 0,
-                                end: 200
-                            },
-                            {
-                                start: 0,
-                                end: 20
-                            }
-                        ],
+                        // dataZoom: [{
+                        //         type: 'inside',
+                        //         start: 0,
+                        //         end: 200
+                        //     },
+                        //     {
+                        //         start: 0,
+                        //         end: 20
+                        //     }
+                        // ],
                         series: series_i.data
                     };
                     // 使用刚指定的配置项和数据显示图表。
@@ -676,6 +705,7 @@
         }
 
         .content {
+            width: 100%;
             margin-top: 20px;
             height: 890px;
 
@@ -694,6 +724,12 @@
                         // background-image: url('https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg');
                         // background-size: 100% 100%;
                     }
+                }
+                .img-span1 {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr 1fr 1fr;
+                    /* 设置间距 */
+                    grid-gap: 20px;
                 }
             }
         }

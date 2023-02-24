@@ -13,9 +13,9 @@
                 槽号：
                 <el-popover popper-class="vmpopper" placement="bottom-start" width="450" trigger="click">
                     <el-tree ref="tree" :data="tree_data" show-checkbox node-key="value"
-                        :filter-node-method="filterNode">
+                        :filter-node-method="filterNode" @check-change="handleCheckChange">
                     </el-tree>
-                    <el-input style="width:120px" slot="reference" placeholder="输入关键字" v-model="paramsText">
+                    <el-input style="width:120px" slot="reference" :placeholder="InfoText" v-model="paramsText">
                     </el-input>
                 </el-popover>
             </div>
@@ -150,6 +150,7 @@
         data() {
             return {
                 dialogVisible: false,
+                InfoText: '请勾选槽号',
                 paramsText: '',
                 tree_data: [],
                 form: {
@@ -373,7 +374,12 @@
                 // })
             },
             handleCheckChange() {
-                
+                let arr = this.$refs['tree'].getCheckedKeys();
+                if(arr[0]==='0') {
+                    this.InfoText = arr.toString().substr(2)
+                } else {
+                    this.InfoText = arr.toString()
+                }
             },
             filterNode(value, data) {
                 if (!value) return true;
@@ -516,7 +522,11 @@
                 // 基于准备好的dom，初始化echarts实例  这个和上面的main对应
                 let myChart = echarts.init(document.getElementById("echart2"));
                 // 指定图表的配置项和数据
-                let option = option = {
+                let option = {
+                    title: {
+                        left: 'center',
+                        text: '影响出铝量的重要特征排名情况'
+                    },
                 tooltip: {
                     trigger: 'axis',
                     position: function (pt) {
@@ -533,16 +543,22 @@
                     }
                 },
                 xAxis: {
-                    data: x_name
+                    data: x_name,
+                    name: '特征'
                 },
                 yAxis: {
                     type: 'value',
+                    name: '重要性'
                 },
                 series: [
                     {
                         data: y_data,
-                        type: 'bar'
-                    }
+                        type: 'bar',
+                        label: {
+                            show: true,
+                            position: 'top'
+                        },
+                    },
                 ]
                 };
                 // 使用刚指定的配置项和数据显示图表。

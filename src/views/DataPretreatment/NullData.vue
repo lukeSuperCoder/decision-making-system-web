@@ -5,9 +5,9 @@
                 槽号：
                 <el-popover popper-class="vmpopper" placement="bottom-start" width="450" trigger="click">
                     <el-tree ref="tree" :data="tree_data" show-checkbox node-key="value"
-                     :filter-node-method="filterNode">
+                     :filter-node-method="filterNode" @check-change="handleCheckChange">
                     </el-tree>
-                    <el-input style="width:120px" slot="reference" placeholder="输入关键字" v-model="paramsText">
+                    <el-input style="width:120px" slot="reference" :placeholder="InfoText" v-model="paramsText">
                     </el-input>
                 </el-popover>
             </div>
@@ -49,7 +49,7 @@
                     :data="json_data"
                     :fields="json_fields"
                     worksheet="My Worksheet"
-                    name="filename.xls"
+                    name="空缺值填充数据.xls"
                     >
                     <el-button type="primary" style="height:100%;margin-left: 10px;">保存</el-button>
                     </download-excel>
@@ -112,6 +112,7 @@
                     },
                 },
                 paramsText: '',
+                InfoText: '请勾选槽号',
                 tree_data: [],
                 pageNo: 1,
                 pageSize: 10,
@@ -178,37 +179,10 @@
                 table_column: [],
                 series_list: [],
                 json_fields: {              //表头设计
-                    "全名": "name",
-                    "城市": "city",
-                    "电话1": "phone.mobile",
-                    "电话2": {
-                    field: "phone.landline",
-                    callback: (value) => {   //电话2这一列通过一个回调函数格式化了该列数据
-                        return `Landline Phone - ${value}`;
-                    },
-                    },
+                   
                 },
                 json_data: [               //表格数据
-                    {
-                    name: "Tony Peña",
-                    city: "New York",
-                    country: "United States",
-                    birthdate: "1978-03-15",
-                    phone: {
-                        mobile: "1-541-754-3010",
-                        landline: "(541) 754-3010",
-                    },
-                    },
-                    {
-                    name: "Thessaloniki",
-                    city: "Athens",
-                    country: "Greece",
-                    birthdate: "1987-11-23",
-                    phone: {
-                        mobile: "+1 855 275 5071",
-                        landline: "(2741) 2621-244",
-                    },
-                    },
+
                 ],
             }
         },
@@ -234,6 +208,14 @@
                         this.form.params_options = res.data;
                     }
                 })
+            },
+            handleCheckChange() {
+                let arr = this.$refs['tree'].getCheckedKeys();
+                if(arr[0]==='0') {
+                    this.InfoText = arr.toString().substr(2)
+                } else {
+                    this.InfoText = arr.toString()
+                }
             },
             filterNode(value, data) {
                 if (!value) return true;
@@ -313,6 +295,17 @@
                     return
                 }
                 this.table_column = legend;
+                var str = '{"列表号":"list","槽号":"number","时间":"time",'
+                this.table_column.forEach((i,index) => {
+                    if(index===this.table_column.length-1) {
+                        str+='"'+i+'":"'+i+'"'
+                    } else {
+                        str+='"'+i+'":"'+i+'",'
+                    }
+                })
+                str += '}'
+                console.log(JSON.parse(str));
+                this.json_fields = JSON.parse(str)
                 this.form.numbers = this.$refs['tree'].getCheckedKeys();
                 var params = {
                     numbers: this.form.numbers.toString(),
@@ -436,6 +429,7 @@
                     getKnnChart(params).then((res) => {
                         if(res.code === 200) {
                             this.tableData = res.data;
+                            this.json_data = this.tableData;
                             this.tableData_visible = true;
                             this.total = res.total;
                         }

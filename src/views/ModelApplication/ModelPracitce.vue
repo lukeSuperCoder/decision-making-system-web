@@ -2,21 +2,41 @@
     <div class="main">
         <el-row class="header">
             <div class="header-item">
-                模型：
-                <el-select style="width:180px" v-model="form.chart_type" collapse-tags multiple placeholder="请选择">
-                    <el-option v-for="item in form.chart_options" :key="item.value" :label="item.label" :value="item.value">
+                数据源：
+                <el-select style="width:160px" v-model="form.origin" placeholder="请选择" @change="getLoadData">
+                    <el-option v-for="item in form.origin_options" :key="item.value" :label="item.label"
+                        :value="item.value">
                     </el-option>
                 </el-select>
             </div>
             <div class="header-item">
-                参数优化算法：
-                <el-select style="width:180px" v-model="form.origin" collapse-tags multiple placeholder="请选择">
-                    <el-option v-for="item in form.origin_options" :key="item.value" :label="item.label" :value="item.value">
+                特征参数：
+                <el-select style="width:160px" v-model="form.params2" collapse-tags multiple placeholder="请选择">
+                    <el-option v-for="item in form.params_options2" :key="item.value" :label="item.label"
+                        :value="item.value">
                     </el-option>
                 </el-select>
             </div>
             <div class="header-item">
-                <el-button type="primary" @click="getCharts">查询</el-button>
+                决策参数：
+                <el-select style="width:160px" v-model="form.params1" collapse-tags multiple placeholder="请选择">
+                    <el-option v-for="item in form.params_options1" :key="item.value" :label="item.label"
+                        :value="item.value">
+                    </el-option>
+                </el-select>
+            </div>
+            <div class="header-item">
+                算法类型：
+                <el-select style="width:160px" v-model="form.chart_type" collapse-tags multiple placeholder="请选择" @change="changeType">
+                    <el-option v-for="item in form.chart_options" :key="item.value" :label="item.label"
+                        :value="item.value">
+                    </el-option>
+                </el-select>
+            </div>
+            <div class="header-item">
+                <el-button type="primary" @click="openSetDialog" v-show="form.chart_type.length<=1">确定</el-button>
+                <el-button type="primary" @click="openSetDialog" v-show="form.chart_type.length>1">模型对比</el-button>
+                <!-- <el-button type="primary" @click="getCharts">查询</el-button> -->
             </div>
         </el-row>
         <el-row class="content">
@@ -24,7 +44,7 @@
                 <div id="echart-crad"></div>
                 <el-table
                     :data="tableData"
-                    style="width: 100%">
+                    style="width: 50%">
                     <el-table-column
                         prop="value"
                         label="结果"
@@ -70,95 +90,239 @@
                 </el-row> -->
             </el-card>
         </el-row>
+        <el-dialog
+        title="参数设置"
+        :modal-append-to-body="false"
+        :visible.sync="dialogVisible"
+        width="40%">
+        <div style="height: 400px; overflow-y:auto">
+            <el-row class="header1" v-for="o in map_column">
+            <div class="header-item">
+               <div>参数：</div> <div class="blod">{{o}}</div>        
+            </div>
+            <div class="header-item">
+                值：<el-input style="width:160px"  v-model="map_form[o]"></el-input>
+            </div>
+        </el-row>
+        </div>
+        
+        <span slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="getJcChart">执 行</el-button>
+        </span>
+        </el-dialog>
     </div>
 </template>
 
 <script>
     import * as echarts from 'echarts';
     import {
-        getNoMenu,getParamsMenu,getBaseChartByParam
+        getNoMenu,getParamsMenu,getBaseChartByParam,getLoad,getValueLoad,
     } from '../../utils/request';
     export default {
         name: "AbnormalData",
         components: {},
         data() {
             return {
+                dialogVisible: false,
                 paramsText: '',
                 tree_data: [],
                 form: {
                     origin: '',
                     origin_options: [{
-                        value: '1',
-                        label: '无'
-                    },{
-                        value: '1',
-                        label: 'MPA'
-                    },{
-                        value: '1',
-                        label: 'TF-MPA'
-                    }],
+                            label: 'KNN上阈值填充数据',
+                            value: 'knn_syz'
+                        },
+                        {
+                            label: 'KNN下阈值填充数据',
+                            value: 'knn_xyz'
+                        },
+                        {
+                            label: 'KNN上下阈值填充数据',
+                            value: 'knn_sxyz'
+                        },
+                        {
+                            label: '均值上阈值填充数据',
+                            value: 'jz_syz'
+                        },
+                        {
+                            label: '均值下阈值填充数据',
+                            value: 'jz_xyz'
+                        },
+                        {
+                            label: '均值上下阈值填充数据',
+                            value: 'jz_sxyz'
+                        },
+                        {
+                            label: '上邻数上阈值填充数据',
+                            value: 'sls_syz'
+                        },
+                        {
+                            label: '上邻数下阈值填充数据',
+                            value: 'sls_xyz'
+                        },
+                        {
+                            label: '上邻数上下阈值填充数据',
+                            value: 'sls_sxyz'
+                        },
+                        {
+                            label: '下邻数上阈值填充数据',
+                            value: 'xls_syz'
+                        },
+                        {
+                            label: '下邻数下阈值填充数据',
+                            value: 'xls_xyz'
+                        },
+                        {
+                            label: '下邻数上下阈值填充数据',
+                            value: 'xls_sxyz'
+                        },
+                        {
+                            label: '中位数上阈值填充数据',
+                            value: 'zws_syz'
+                        },
+                        {
+                            label: '中位数下阈值填充数据',
+                            value: 'zws_xyz'
+                        },
+                        {
+                            label: '中位数上下阈值填充数据',
+                            value: 'zws_sxyz'
+                        },
+                        {
+                            label: '众数上阈值填充数据',
+                            value: 'zs_syz'
+                        },
+                        {
+                            label: '众数下阈值填充数据',
+                            value: 'zs_xyz'
+                        },
+                        {
+                            label: '众数上下阈值填充数据',
+                            value: 'zs_sxyz'
+                        },
+                        {
+                            label: '最大值上阈值填充数据',
+                            value: 'zdz_syz'
+                        },
+                        {
+                            label: '最大值下阈值填充数据',
+                            value: 'zdz_xyz'
+                        },
+                        {
+                            label: '最大值上下阈值填充数据',
+                            value: 'zdz_sxyz'
+                        },
+                        {
+                            label: '最小值上阈值填充数据',
+                            value: 'zxz_syz'
+                        },
+                        {
+                            label: '最小值下阈值填充数据',
+                            value: 'zxz_xyz'
+                        },
+                        {
+                            label: '最小值上下阈值填充数据',
+                            value: 'zxz_sxyz'
+                        }
+                    ],
                     params: '',
+                    params1: '',
+                    params2: '',
                     params_options: [],
+                    params_options1: [
+                        {
+                            "value": "CLL",
+                            "label": "槽控工艺报出铝量 (kg)"
+                        },
+                        {
+                            "value": "SDDY",
+                            "label": "槽控日报设定电压 (V)"
+                        }
+                    ],
+                    params_options2: [
+                        {
+                            "value": "CLL",
+                            "label": "槽控工艺报出铝量 (kg)"
+                        },
+                        {
+                            "value": "FZB",
+                            "label": "槽控工艺报分子比 (N/A)"
+                        },
+                        {
+                            "value": "YHLND",
+                            "label": "槽控工艺报氧化铝浓度 (%)"
+                        },
+                        {
+                            "value": "DJWD",
+                            "label": "槽控工艺报电解温度 (℃)"
+                        },
+                        {
+                            "value": "LSP",
+                            "label": "槽控工艺报铝水平 (cm)"
+                        },
+                        {
+                            "value": "XLCS",
+                            "label": "槽控日报下料次数 (次)"
+                        },
+                        {
+                            "value": "GZDY",
+                            "label": "槽控日报工作电压 (V)"
+                        },
+                        {
+                            "value": "PJDY",
+                            "label": "槽控日报平均电压 (V)"
+                        },
+                        {
+                            "value": "SDDY",
+                            "label": "槽控日报设定电压 (V)"
+                        },
+                        {
+                            "value": "ZZ",
+                            "label": "槽控日报针振 (mV)"
+                        }
+                    ],
                     date: '',
                     chart_type: '',
                     chart_options: [{
-                        label: 'LSTM',
-                        value: '1'
+                        label: 'lstm',
+                        value: 'lstm'
                     },
                     {
-                        label: 'dfLSTM',
-                        value: '2'
+                        label: 'dflstm',
+                        value: 'dflstm'
+                    },
+                    {
+                        label: 'MPA_lstm',
+                        value: 'MPA_lstm'
+                    },
+                    {
+                        label: 'MPA_dflstm',
+                        value: 'MPA_dflstm'
+                    },
+                    {
+                        label: 'TF-MPA_lstm',
+                        value: 'TF-MPA_lstm'
+                    },
+                    {
+                        label: 'TF-MPA_dflstm',
+                        value: 'TF-MPA_dflstm'
                     }]
                 },
+                map_column: [],
+                map_form: {
+                    num_leaves: '',
+                    eta: '',
+                    max_depth: '',
+                    min_data_in_leaf: ''
+                },
                 series_list: [],
-                tableData: [{
-                    value: 'LSTM',
-                    Num_layers: '1',
-                    Hidden_size: '64',
-                    lr: '0.01',
-                    Batch_size: '20',
-                    optimizer: 'adam'
-                }, {
-                    value: 'dfLSTM',
-                    Num_layers: '1',
-                    Hidden_size: '64',
-                    lr: '0.01',
-                    Batch_size: '20',
-                    optimizer: 'adam'
-                }, {
-                    value: 'MPA-LSTM',
-                    Num_layers: '1',
-                    Hidden_size: '128',
-                    lr: '0.01',
-                    Batch_size: '20',
-                    optimizer: 'adam'
-                }, {
-                    value: 'MPA-dfLSTM',
-                    Num_layers: '1',
-                    Hidden_size: '128',
-                    lr: '0.01030531',
-                    Batch_size: '20',
-                    optimizer: 'adam'
-                }, {
-                    value: 'TF-MPA-LSTM',
-                    Num_layers: '1',
-                    Hidden_size: '32',
-                    lr: '0.02547853',
-                    Batch_size: '20',
-                    optimizer: 'adam'
-                }, {
-                    value: 'TF-MPA-dfLSTM',
-                    Num_layers: '1',
-                    Hidden_size: '128',
-                    lr: '0.02961708',
-                    Batch_size: '20',
-                    optimizer: 'adam'
-                }]
+                tableData: []
             }
         },
         computed: {},
         mounted() {
             this.getNoMenuData();
+            this.initLoadData();
         },
         watch: {
             paramsText(val) {
@@ -166,6 +330,71 @@
             }
         },
         methods: {
+            initLoadData() {
+                getLoad({
+                    name: ''
+                }).then((res) => {
+                    if (res.code === 200) {
+                        var arr = []
+                        this.form.origin_options.forEach((item) => {
+                            res.data.forEach((j) => {
+                                if (item.value === j.name) {
+                                    arr.push(item)
+                                }
+                            })
+                        })
+                        this.form.origin_options = arr;
+                        console.log(arr);
+                    }
+                })
+            },
+            getLoadData(name) {
+                // console.log(this.form.chart_type);
+                
+                // console.log(str);
+                // getLoad({
+                //     name: name,
+                //     type: '1',
+                //     fun: str
+                // }).then((res) => {
+                //     if (res.code === 200) {
+                //         this.form.date = [res.data[0].start_time, res.data[0].end_time];
+                //         var arr = res.data[0].numbers.split(',');
+                //         var data = []
+                //         this.tree_data[0].children.forEach((i) => {
+                //             arr.forEach((j) => {
+                //                 if (i.value === j) {
+                //                     data.push(i)
+                //                 }
+                //             })
+                //         })
+                //         this.tree_data[0].children = data;
+                //     }
+                // })
+                var arr = name.split('_');
+                var name_str = arr[0]+'-'+arr[1]
+                this.data_name = name_str;
+            },
+            getValueGy() {
+                var str = ''
+                this.form.chart_type.forEach((i,index) => {
+                    if(index===this.form.chart_type.length-1) {
+                        str+='`'+i+'_隐藏层层数`,'+'`'+i+'_隐藏层神经元个数`,'+'`'+i+'_学习率`'
+                    } else {
+                        str+='`'+i+'_隐藏层层数`,'+'`'+i+'_隐藏层神经元个数`,'+'`'+i+'_学习率`,'
+                    }
+                })
+                getValueLoad({
+                    name: this.data_name,
+                    type: '1',
+                    fun: str
+                }).then((res) => {
+                    if (res.code === 200) {
+                        this.map_form = res.data[0]
+                        this.map_column = Object.keys(res.data[0])
+                    }
+                })
+            },
             getNoMenuData() {
                 getNoMenu().then((res) => {
                     if (res.code === 200) {
@@ -181,9 +410,19 @@
             handleCheckChange() {
                 
             },
+            changeType() {
+                console.log(this.form.chart_type);
+                if(this.form.chart_type.length===1) {
+
+                }
+            },
             filterNode(value, data) {
                 if (!value) return true;
                 return data.label.indexOf(value) !== -1;
+            },
+            openSetDialog() {
+                this.dialogVisible = true
+                this.getValueGy()
             },
             getCharts() {
                 var code_arr = this.$refs['tree'].getCheckedNodes().map((item) => {return item.value})
@@ -383,6 +622,13 @@
                 };
                 // 使用刚指定的配置项和数据显示图表。
                 myChart.setOption(option);
+            },
+            getJcChart() {
+                getJcData(params).then((res) => {
+                    if(res.code === 200) {
+                        this.tableData = res.data;
+                    }
+                })
             }
         },
     };
@@ -406,7 +652,25 @@
                 width: 600px;
             }
         }
+        .header1 {
+            height: 60px;
+            display: flex;
 
+            .header-item {
+                width: 50%;
+                display: flex;
+                align-items: center;
+                margin-left: 20px;
+                .blod {
+                    font-weight: 600;
+                    font-size: 20px;
+                }
+            }
+
+            .date {
+                width: 600px;
+            }
+        }
         .content {
             margin-top: 20px;
             height: 890px;
