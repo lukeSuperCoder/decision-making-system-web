@@ -41,48 +41,30 @@
         </el-row>
         <el-row class="content">
             <el-card class="card">
-                <div id="echart-crad"></div>
                 <el-table
                     :data="tableData"
-                    style="width: 50%">
+                    style="width: 100%">
                     <el-table-column
-                        prop="value"
-                        label="结果"
-                        align="center">
-                    </el-table-column>
-                    <el-table-column
-                        prop="Num_layers"
-                        label="Num_layers"
-                        align="center">
-                    </el-table-column>
-                    <el-table-column
-                        prop="Hidden_size"
-                        label="Hidden_size"
-                        align="center">
-                    </el-table-column>
-                    <el-table-column
-                        prop="lr"
-                        label="lr"
-                        align="center">
-                    </el-table-column>
-                    <el-table-column
-                        prop="Batch_size"
-                        label="Batch_size"
-                        align="center">
-                    </el-table-column>
-                    <el-table-column
-                        prop="optimizer"
-                        label="optimizer"
+                        v-for="o in tableColumn"
+                        :prop="o"
+                        :label="o"
                         align="center">
                     </el-table-column>
                     </el-table>
+                    <div class="pagediv">
+                    <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageNo"
+                    :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper"
+                    :total="total">
+                    </el-pagination>
+                    </div>
+                <div id="echart-crad"></div> 
                 <!-- <el-row type="flex" justify="center">
                     <div id="echart1" style="width: 100%; height: 400px"></div>
                 </el-row>
                 <el-row type="flex" justify="center">
                     <div id="echart2" style="width: 100%; height: 400px"></div>
-                </el-row>
-                <el-row type="flex" justify="center"> 
+                </el-row> -->
+                <!-- <el-row type="flex" justify="center"> 
                     <div id="echart3" style="width: 100%; height: 400px"></div>
                 </el-row>
                 <el-row type="flex" justify="center"> 
@@ -116,7 +98,7 @@
 <script>
     import * as echarts from 'echarts';
     import {
-        getNoMenu,getParamsMenu,getBaseChartByParam,getLoad,getValueLoad,
+        getNoMenu,getParamsMenu,getBaseChartByParam,getLoad,getValueLoad,getJcData
     } from '../../utils/request';
     export default {
         name: "AbnormalData",
@@ -126,6 +108,9 @@
                 dialogVisible: false,
                 paramsText: '',
                 tree_data: [],
+                pageNo: 1,
+                pageSize: 10,
+                total: 0,
                 form: {
                     origin: '',
                     origin_options: [{
@@ -352,25 +337,13 @@
                 // console.log(this.form.chart_type);
                 
                 // console.log(str);
-                // getLoad({
-                //     name: name,
-                //     type: '1',
-                //     fun: str
-                // }).then((res) => {
-                //     if (res.code === 200) {
-                //         this.form.date = [res.data[0].start_time, res.data[0].end_time];
-                //         var arr = res.data[0].numbers.split(',');
-                //         var data = []
-                //         this.tree_data[0].children.forEach((i) => {
-                //             arr.forEach((j) => {
-                //                 if (i.value === j) {
-                //                     data.push(i)
-                //                 }
-                //             })
-                //         })
-                //         this.tree_data[0].children = data;
-                //     }
-                // })
+                getLoad({
+                    name: name,
+                }).then((res) => {
+                    if (res.code === 200) {
+                        this.form.date = [res.data[0].start_time, res.data[0].end_time];
+                    }
+                })
                 var arr = name.split('_');
                 var name_str = arr[0]+'-'+arr[1]
                 this.data_name = name_str;
@@ -424,6 +397,14 @@
                 this.dialogVisible = true
                 this.getValueGy()
             },
+            handleSizeChange(val) {
+                this.pageSize = val
+                this.getJcChart();
+            },
+            handleCurrentChange(val) {
+                this.pageNo = val
+                this.getJcChart();
+            },
             getCharts() {
                 var code_arr = this.$refs['tree'].getCheckedNodes().map((item) => {return item.value})
                 // var params = {
@@ -472,16 +453,16 @@
                         })
                         console.log(this.series_list);
                         document.getElementById('echart-crad').innerHTML = html
-                        this.drawChart1();
+                        this.drawChart1(x_data,y_data);
+                        this.drawChart2(x_data,y_data);
                     }
                 })
                 // this.drawChart2();
                 // this.drawChart3();
             },
-            drawChart1() {
-                this.series_list.forEach((series_i) => {
+            drawChart1(x_data,y_data) {
                     // 基于准备好的dom，初始化echarts实例  这个和上面的main对应
-                    let myChart = echarts.init(document.getElementById(series_i.name));
+                    let myChart = echarts.init(document.getElementById('echart1'));
                     // 指定图表的配置项和数据
                     let option = { 
                     tooltip: {
@@ -492,7 +473,7 @@
                     },
                     title: {
                         left: 'center',
-                        text: series_i.name
+                        text: '出铝量'
                     },
                     toolbox: {
                         feature: {
@@ -504,8 +485,8 @@
                         }
                     },
                     xAxis: {
-                        type: 'time',
-                        boundaryGap: false
+                        type: 'category',
+                        data: x_data
                     },
                     yAxis: {
                         type: 'value',
@@ -528,7 +509,7 @@
                         end: 20
                         }
                     ],
-                    series: series_i.data
+                    series: y_data
                     }; 
                     // 使用刚指定的配置项和数据显示图表。
                     myChart.setOption(option);
@@ -541,33 +522,71 @@
                             console.log(params);
                             // window.selectSeries = '';
                         }); 
-                })
                 
             },
-            drawChart2() {
-                // 基于准备好的dom，初始化echarts实例  这个和上面的main对应
-                let myChart = echarts.init(document.getElementById("echart2"));
-                // 指定图表的配置项和数据
-                let option = {
-                    title: {
-                        text: "ECharts 入门示例",
+            drawChart2(x_data,y_data) {
+                    // 基于准备好的dom，初始化echarts实例  这个和上面的main对应
+                    let myChart = echarts.init(document.getElementById('echart2'));
+                    // 指定图表的配置项和数据
+                    let option = { 
+                    tooltip: {
+                        trigger: 'axis',
+                        position: function (pt) {
+                            return [pt[0], '10%'];
+                        },
                     },
-                    tooltip: {},
-                    legend: {
-                        data: ["销量"],
+                    title: {
+                        left: 'center',
+                        text: '设定电压'
+                    },
+                    toolbox: {
+                        feature: {
+                        dataZoom: {
+                            yAxisIndex: 'none'
+                        },
+                        restore: {},
+                        saveAsImage: {}
+                        }
                     },
                     xAxis: {
-                        data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"],
+                        type: 'category',
+                        data: x_data
                     },
-                    yAxis: {},
-                    series: [{
-                        name: "销量",
-                        type: "bar",
-                        data: [5, 20, 36, 10, 10, 20],
-                    }, ],
-                };
-                // 使用刚指定的配置项和数据显示图表。
-                myChart.setOption(option);
+                    yAxis: {
+                        type: 'value',
+                        boundaryGap: [0, '100%'],
+                        min: function (value) {
+                            return value.min - 0.1;
+                        },
+                        max: function (value) {
+                            return value.max + 0.1;
+                        },
+                    },
+                    dataZoom: [
+                        {
+                        type: 'inside',
+                        start: 0,
+                        end: 200
+                        },
+                        {
+                        start: 0,
+                        end: 20
+                        }
+                    ],
+                    series: y_data
+                    }; 
+                    // 使用刚指定的配置项和数据显示图表。
+                    myChart.setOption(option);
+                    //当 鼠标移到线条上时触发
+                    myChart.on('click', function (params) {
+                        console.log(params);
+                    });  
+                    //当 鼠标移出线条时触发 ，如果不处理这个，鼠标移到空白上还有tooltip显示。
+                    myChart.on('mouseout', function (params) {
+                            console.log(params);
+                            // window.selectSeries = '';
+                        }); 
+                
             },
             drawChart3() {
                 // 基于准备好的dom，初始化echarts实例  这个和上面的main对应
@@ -624,9 +643,71 @@
                 myChart.setOption(option);
             },
             getJcChart() {
+                var para_str = ''
+                this.form.params1.forEach((i) => {
+                    this.form.chart_type.forEach((j) => {
+                        para_str+=i+'_ture,'+i+'_'+j+'_pred,'
+                    })
+                })
+                var params = {
+                    "param": para_str.substring(0,para_str.length-1),
+                    "date": this.form.date.toString(),
+                    "pageNo": this.pageNo,
+                    "pageSize": this.pageSize,
+                    "tablename": this.data_name+'-jc'
+                }
                 getJcData(params).then((res) => {
                     if(res.code === 200) {
+                        this.tableColumn = Object.keys(res.data[0])
                         this.tableData = res.data;
+                        this.dialogVisible = false;
+                        this.total = res.total;
+                        var x_data = []
+                        var arr_jc = Object.keys(this.tableData[0])
+                        var arr_obj = []
+                        var y_data = []
+                        arr_jc.forEach((i) => {
+                            arr_obj.push({
+                                name: i,
+                                type: 'line',
+                                data: [],
+                            })
+                        })
+                        this.tableData.forEach((item) => {
+                            x_data.push(item.time)
+                            arr_jc.forEach((j, index) => {
+                                arr_obj[index].data.push(parseFloat(item[j]))
+                            })
+                        })
+                        var cll_ydata= []
+                        var sddy_ydata= []
+                        arr_obj.forEach((o) => {
+                            if(o.name!=='time'&&o.name!=='SDDY_ture'&&o.name!=='CLL_ture') {
+                                if(o.name.split('_')[0]==='CLL') {
+                                    cll_ydata.push(o)
+                                }else {
+                                    sddy_ydata.push(o)
+                                }
+                            }
+                        })
+                        let html = ''
+                        if(this.form.params1.length===1) {
+                            if(this.form.params1[0]==='CLL') {
+                                html = `<el-row type="flex" justify="center"><div id="echart1" style="width: 100%; height: 400px"></div></el-row>`
+                                document.getElementById('echart-crad').innerHTML = html
+                                this.drawChart1(x_data,cll_ydata);
+                            } else {
+                                html = `<el-row type="flex" justify="center"><div id="echart2" style="width: 100%; height: 400px"></div></el-row>`
+                                document.getElementById('echart-crad').innerHTML = html
+                                this.drawChart2(x_data,sddy_ydata);
+                            }
+                        } else if(this.form.params1.length===2) {
+                            html = `<el-row type="flex" justify="center"><div id="echart1" style="width: 100%; height: 400px"></div></el-row><el-row type="flex" justify="center"><div id="echart2" style="width: 100%; height: 400px"></div></el-row>`
+                            document.getElementById('echart-crad').innerHTML = html
+                            this.drawChart1(x_data,cll_ydata);
+                            this.drawChart2(x_data,sddy_ydata);
+                        }
+                        
                     }
                 })
             }
@@ -678,6 +759,10 @@
             .card {
                 height: 100%;
                 overflow-y: auto;
+                .pagediv {
+                    height: 5rem;
+                    display: flex;
+                    }
             }
         }
     }

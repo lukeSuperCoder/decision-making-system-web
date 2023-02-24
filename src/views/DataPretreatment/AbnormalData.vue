@@ -736,6 +736,10 @@
             .card {
                 height: 100%;
                 overflow-y: auto;
+                .pagediv {
+                    height: 5rem;
+                    display: flex;
+                    }
             }
         }
     }
