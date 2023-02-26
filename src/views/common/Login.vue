@@ -202,12 +202,14 @@ export default {
 
   .login-main ::v-deep {
     position: fixed;
-    width: 1200px;
-    height: 500px;
-    margin-top: 400px;
-    margin-left: 430px;
+    width: 60rem;
+    height: 22rem;
+    margin-top: 24rem;
+    margin-left: 26.875rem;
     background: url("../../assets/image/img/loginbar.png") round;
     background-size: cover;
+    position: fixed;
+   
     .el-form-item__content {
       line-height: 60px;
     }
