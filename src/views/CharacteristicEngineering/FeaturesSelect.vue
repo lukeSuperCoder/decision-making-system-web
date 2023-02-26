@@ -3,21 +3,30 @@
         <el-row class="header">
             <div class="header-item">
                 数据源：
-                <el-select style="width:160px" v-model="form.origin" collapse-tags multiple placeholder="请选择">
-                    <el-option  v-for="item in form.origin_options" :key="item.value" :label="item.label"
+                <el-select style="width:160px" v-model="form.origin" placeholder="请选择" @change="getLoadData">
+                    <el-option v-for="item in form.origin_options" :key="item.value" :label="item.label"
                         :value="item.value">
                     </el-option>
                 </el-select>
             </div>
             <div class="header-item">
+                槽号：
+                <el-popover popper-class="vmpopper" placement="bottom-start" width="450" trigger="click">
+                    <el-tree ref="tree" :data="tree_data" show-checkbox node-key="value"
+                        :filter-node-method="filterNode" @check-change="handleCheckChange">
+                    </el-tree>
+                    <el-input style="width:120px" slot="reference" :placeholder="InfoText" v-model="paramsText">
+                    </el-input>
+                </el-popover>
+            </div>
+            <!-- <div class="header-item">
                 参数：
                 <el-select style="width:250px" v-model="form.params" collapse-tags multiple placeholder="请选择">
                     <el-option  v-for="item in form.params_options" :key="item.value" :label="item.label"
                         :value="item.value">
                     </el-option>
                 </el-select>
-                <!-- <span style="margin-left: 20px;">起止时间：</span> -->
-            </div>
+            </div> -->
             <!-- <div>
                 <div class="block">
                     <el-date-picker v-model="form.date" type="daterange" align="right" unlink-panels range-separator="至"
@@ -28,7 +37,7 @@
             </div> -->
             <div class="header-item">
                 算法：
-                <el-select style="width:180px" v-model="form.chart_type" collapse-tags multiple placeholder="请选择">
+                <el-select style="width:180px" v-model="form.chart_type" placeholder="请选择">
                     <el-option v-for="item in form.chart_options" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
                 </el-select>
@@ -40,15 +49,13 @@
                     </el-option>
                 </el-select>
             </div> -->
+            
             <div class="header-item">
-                <el-button type="primary" @click="addParams">添加参数</el-button>
-                <el-button type="primary" @click="reduceParams">删除参数</el-button>
-            </div>
-            <div class="header-item">
-                <el-button type="primary" @click="drawChart2">开始</el-button>
+                <el-button type="primary" @click="openSetDialog">参数设置</el-button>
+                <el-button type="primary" @click="deleteAbnCharts">删除</el-button>
             </div>
         </el-row>
-        <el-row style="margin-top:15px" class="header" v-for="index in form.select_params_list" :key="index">
+        <!-- <el-row style="margin-top:15px" class="header" v-for="index in form.select_params_list" :key="index">
             <div class="header-item">
                 参数：
                 <el-select style="width:160px" v-model="form.select_params_value[index]" placeholder="请选择">
@@ -60,7 +67,11 @@
             <div class="header-item">
                 值：<el-input style="width:160px" v-model="form.select_params_value[index]"></el-input>
             </div>
-        </el-row>
+            <div class="header-item">
+                <el-button type="primary" @click="addParams">添加参数</el-button>
+                <el-button type="primary" @click="reduceParams">删除参数</el-button>
+            </div>
+        </el-row> -->
         <el-row class="content">
             <el-card class="card">
                 <div id="echart-crad"></div>
@@ -81,49 +92,174 @@
                 </el-row> -->
             </el-card>
         </el-row>
+        <el-dialog
+        title="GA-LightGBM  参数设置"
+        :modal-append-to-body="false"
+        :visible.sync="dialogVisible"
+        width="30%">
+        <el-row class="header1">
+            <div class="header-item">
+               <div>参数：</div> <div class="blod">num_leaves</div>        
+            </div>
+            <div class="header-item">
+                值：<el-input style="width:160px"  v-model="map_form['num_leaves']"></el-input>
+            </div>
+        </el-row>
+        <el-row class="header1">
+            <div class="header-item">
+                <div>参数：</div> <div class="blod">eta</div> 
+            </div>
+            <div class="header-item">
+                值：<el-input style="width:160px" v-model="map_form['eta']"></el-input>
+            </div>
+        </el-row>
+        <el-row class="header1">
+            <div class="header-item">
+                <div>参数：</div>    <div class="blod">max_depth</div>        
+            </div>
+            <div class="header-item">
+                值：<el-input style="width:160px" v-model="map_form['max_depth']"></el-input>
+            </div>
+        </el-row>
+        <el-row class="header1">
+            <div class="header-item">
+                <div>参数：</div><div class="blod">min_data_in_leaf</div>  
+            </div>
+            <div class="header-item">
+                值：<el-input style="width:160px" v-model="map_form['min_data_in_leaf']"></el-input>
+            </div>
+        </el-row>
+        <span slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="getChartBar">执 行</el-button>
+        </span>
+        </el-dialog>
     </div>
 </template>
 
 <script>
     import * as echarts from 'echarts';
     import {
-        getNoMenu,getParamsMenu,getBaseChartByParam
+        getNoMenu,getParamsMenu,getBaseChartByParam,getLoad,getValueLoad,
+        deleteLoad,
+        getHxgChart,
+        getTzgc
     } from '../../utils/request';
     export default {
         name: "AbnormalData",
         components: {},
         data() {
             return {
+                dialogVisible: false,
+                InfoText: '请勾选槽号',
                 paramsText: '',
                 tree_data: [],
                 form: {
                     origin: '',
                     origin_options: [{
-                        label: '阈值-兰铝',
-                        value: '阈值-兰铝'
-                    },{
-                        label: '均值-兰铝',
-                        value: '均值-兰铝'
-                    }],
+                            label: 'KNN上阈值填充数据',
+                            value: 'knn_syz'
+                        },
+                        {
+                            label: 'KNN下阈值填充数据',
+                            value: 'knn_xyz'
+                        },
+                        {
+                            label: 'KNN上下阈值填充数据',
+                            value: 'knn_sxyz'
+                        },
+                        {
+                            label: '均值上阈值填充数据',
+                            value: 'jz_syz'
+                        },
+                        {
+                            label: '均值下阈值填充数据',
+                            value: 'jz_xyz'
+                        },
+                        {
+                            label: '均值上下阈值填充数据',
+                            value: 'jz_sxyz'
+                        },
+                        {
+                            label: '上邻数上阈值填充数据',
+                            value: 'sls_syz'
+                        },
+                        {
+                            label: '上邻数下阈值填充数据',
+                            value: 'sls_xyz'
+                        },
+                        {
+                            label: '上邻数上下阈值填充数据',
+                            value: 'sls_sxyz'
+                        },
+                        {
+                            label: '下邻数上阈值填充数据',
+                            value: 'xls_syz'
+                        },
+                        {
+                            label: '下邻数下阈值填充数据',
+                            value: 'xls_xyz'
+                        },
+                        {
+                            label: '下邻数上下阈值填充数据',
+                            value: 'xls_sxyz'
+                        },
+                        {
+                            label: '中位数上阈值填充数据',
+                            value: 'zws_syz'
+                        },
+                        {
+                            label: '中位数下阈值填充数据',
+                            value: 'zws_xyz'
+                        },
+                        {
+                            label: '中位数上下阈值填充数据',
+                            value: 'zws_sxyz'
+                        },
+                        {
+                            label: '众数上阈值填充数据',
+                            value: 'zs_syz'
+                        },
+                        {
+                            label: '众数下阈值填充数据',
+                            value: 'zs_xyz'
+                        },
+                        {
+                            label: '众数上下阈值填充数据',
+                            value: 'zs_sxyz'
+                        },
+                        {
+                            label: '最大值上阈值填充数据',
+                            value: 'zdz_syz'
+                        },
+                        {
+                            label: '最大值下阈值填充数据',
+                            value: 'zdz_xyz'
+                        },
+                        {
+                            label: '最大值上下阈值填充数据',
+                            value: 'zdz_sxyz'
+                        },
+                        {
+                            label: '最小值上阈值填充数据',
+                            value: 'zxz_syz'
+                        },
+                        {
+                            label: '最小值下阈值填充数据',
+                            value: 'zxz_xyz'
+                        },
+                        {
+                            label: '最小值上下阈值填充数据',
+                            value: 'zxz_sxyz'
+                        }
+                    ],
                     params: '',
                     params_options: [],
                     date: '',
                     chart_type: '',
-                    chart_options: [{
-                        label: 'XGBoost',
-                        value: '1'
-                    },
-                    {
-                        label: '随机森林',
-                        value: '2'
-                    },
-                    {
-                        label: '决策树',
-                        value: '3'
-                    },
+                    chart_options: [
                     {
                         label: 'GA-lightGBM',
-                        value: '4'
+                        value: '1'
                     }],
                     select_params_list: 1,
                     select_params_value: [],
@@ -144,12 +280,20 @@
                         value: '1300'
                     }]
                 },
+                map_form: {
+                    num_leaves: '',
+                    eta: '',
+                    max_depth: '',
+                    min_data_in_leaf: ''
+                },
+                data_name: '',
                 series_list: []
             }
         },
         computed: {},
         mounted() {
             this.getNoMenuData();
+            this.initLoadData();
         },
         watch: {
             paramsText(val) {
@@ -157,20 +301,85 @@
             }
         },
         methods: {
+            initLoadData() {
+                getLoad({
+                    name: ''
+                }).then((res) => {
+                    if (res.code === 200) {
+                        var arr = []
+                        this.form.origin_options.forEach((item) => {
+                            res.data.forEach((j) => {
+                                if (item.value === j.name) {
+                                    arr.push(item)
+                                }
+                            })
+                        })
+                        this.form.origin_options = arr;
+                        console.log(arr);
+                    }
+                })
+            },
+            getLoadData(name) {
+                getLoad({
+                    name: name
+                }).then((res) => {
+                    if (res.code === 200) {
+                        this.form.date = [res.data[0].start_time, res.data[0].end_time];
+                        var arr = res.data[0].numbers.split(',');
+                        var data = []
+                        this.tree_data[0].children.forEach((i) => {
+                            arr.forEach((j) => {
+                                if (i.value === j) {
+                                    data.push(i)
+                                }
+                            })
+                        })
+                        this.tree_data[0].children = data;
+                    }
+                })
+                var arr = name.split('_');
+                var name_str = arr[0]+'-'+arr[1]
+                this.data_name = name_str;
+                getValueLoad({
+                    name: name_str
+                }).then((res) => {
+                    if (res.code === 200) {
+                        this.map_form = res.data[0]
+                    }
+                })
+            },
+            deleteAbnCharts() {
+                deleteLoad({
+                    name: this.form.origin
+                }).then((res) => {
+                    if (res.code === 200) {
+                        this.form.origin = ''
+                        this.form.date = []
+                        this.tree_data = []
+                        this.initLoadData();
+                        this.$message.success('删除成功')
+                    }
+                })
+            },
             getNoMenuData() {
                 getNoMenu().then((res) => {
                     if (res.code === 200) {
                         this.tree_data = res.data;
                     }
                 })
-                getParamsMenu().then((res) => {
-                    if (res.code === 200) {
-                        this.form.params_options = res.data;
-                    }
-                })
+                // getParamsMenu().then((res) => {
+                //     if (res.code === 200) {
+                //         this.form.params_options = res.data;
+                //     }
+                // })
             },
             handleCheckChange() {
-                
+                let arr = this.$refs['tree'].getCheckedKeys();
+                if(arr[0]==='0') {
+                    this.InfoText = arr.toString().substr(2)
+                } else {
+                    this.InfoText = arr.toString()
+                }
             },
             filterNode(value, data) {
                 if (!value) return true;
@@ -185,6 +394,9 @@
                 if(this.form.select_params_list > 0) {
                     this.form.select_params_list -= 1;
                 }
+            },
+            openSetDialog() {
+                this.dialogVisible = true
             },
             getCharts() {
                 var code_arr = this.$refs['tree'].getCheckedNodes().map((item) => {return item.value})
@@ -306,28 +518,48 @@
                 })
                 
             },
-            drawChart2() {
+            drawChart2(x_name,y_data) {
                 // 基于准备好的dom，初始化echarts实例  这个和上面的main对应
                 let myChart = echarts.init(document.getElementById("echart2"));
                 // 指定图表的配置项和数据
                 let option = {
                     title: {
-                        text: "影响出铝量的重要特征",
+                        left: 'center',
+                        text: '影响出铝量的重要特征排名情况'
                     },
-                    tooltip: {},
-                    legend: {
-                        data: ["值"],
+                tooltip: {
+                    trigger: 'axis',
+                    position: function (pt) {
+                        return [pt[0], '10%'];
                     },
-                    xAxis: {
-                        data: ["铝水平 (cm)","出铝量 (kg)","氧化铝浓度 (%)", "针振 (mV)", "分子比 (N/A)","设定电压 (V)", 
-                         "下料次数 (次)","工作电压 (V)","电解温度 (℃)", "平均电压 (V)"],
+                },
+                toolbox: {
+                    feature: {
+                    dataZoom: {
+                        yAxisIndex: 'none'
                     },
-                    yAxis: {},
-                    series: [{
-                        name: "值",
-                        type: "bar",
-                        data: [79, 66, 59, 52, 37, 31, 29, 19, 18, 4],
-                    }, ],
+                    restore: {},
+                    saveAsImage: {}
+                    }
+                },
+                xAxis: {
+                    data: x_name,
+                    name: '特征'
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '重要性'
+                },
+                series: [
+                    {
+                        data: y_data,
+                        type: 'bar',
+                        label: {
+                            show: true,
+                            position: 'top'
+                        },
+                    },
+                ]
                 };
                 // 使用刚指定的配置项和数据显示图表。
                 myChart.setOption(option);
@@ -385,6 +617,22 @@
                 };
                 // 使用刚指定的配置项和数据显示图表。
                 myChart.setOption(option);
+            },
+            getChartBar() {
+                this.dialogVisible= false
+                getTzgc({
+                    name: this.data_name
+                }).then((res) => {
+                    if(res.code===200) {
+                        var x_name = []
+                        var y_data = []
+                        res.data.forEach((item) => {
+                            x_name.push(item.param)
+                            y_data.push(item.value)
+                        })
+                        this.drawChart2(x_name,y_data)
+                    }
+                }) 
             }
         },
     };
@@ -402,6 +650,25 @@
 
             .header-item {
                 margin-left: 20px;
+            }
+
+            .date {
+                width: 600px;
+            }
+        }
+        .header1 {
+            height: 60px;
+            display: flex;
+
+            .header-item {
+                width: 50%;
+                display: flex;
+                align-items: center;
+                margin-left: 20px;
+                .blod {
+                    font-weight: 600;
+                    font-size: 20px;
+                }
             }
 
             .date {

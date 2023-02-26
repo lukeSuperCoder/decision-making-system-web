@@ -6,7 +6,7 @@ import { Service } from "../plugins/axios";
  */
 export function systemLogin(params) {
   return Service({
-    url: "/upms/sysUser/login",
+    url: "/api/login",
     method: "post",
     data: params,
   });
@@ -70,6 +70,17 @@ export function deleteUserInfo(params) {
     url: "/api/deleteuser",
     method: "get",
     params: params
+  });
+}
+/**
+ * 删除多个用户信息
+ * @param params
+ */
+ export function deleteUserById(params) {
+  return Service({
+    url: "/api/deleteuserid",
+    method: "post",
+    data: params
   });
 }
 /**
@@ -258,4 +269,80 @@ export function updateAndDelMenu(params) {
     method: "post",
     data: params
   });
+}
+/**
+ * 获取Abnormal图表数据
+ * @param params
+ */
+ export function getHxgChart(params) {
+  return Service({
+    url: "/api/gethxgchart",
+    method: "post",
+    data: params
+  });
+}
+
+/**
+ * 获取Abnormal图表数据
+ * @param params
+ */
+ export function getJcData(params) {
+  return Service({
+    url: "/api/getjcdata",
+    method: "post",
+    data: params
+  });
+}
+/**
+ * 获取加载数据
+ * @param params
+ */
+ export function getLoad(params) {
+  return Service({
+    url: "/api/getload",
+    method: "get",
+    params: params
+  });
+}
+
+/**
+ * 获取值加载数据
+ * @param params
+ */
+ export function getValueLoad(params) {
+  return Service({
+    url: "/api/getvalueload",
+    method: "get",
+    params: params
+  });
+}
+
+/**
+ * 获取值加载数据
+ * @param params
+ */
+ export function getTzgc(params) {
+  return Service({
+    url: "/api/gettzgc",
+    method: "get",
+    params: params
+  });
+}
+/**
+ * 获取加载数据
+ * @param params
+ */
+ export function setLoad(params) {
+  return Service({
+    url: "/api/setload",
+    method: "post",
+    data: params
+  });
+}
+  export function deleteLoad(params) {
+    return Service({
+      url: "/api/deleteload",
+      method: "get",
+      params: params
+    });
 }
