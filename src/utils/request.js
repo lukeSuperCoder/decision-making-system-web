@@ -328,6 +328,18 @@ export function updateAndDelMenu(params) {
     params: params
   });
 }
+
+/**
+ * 获取值加载数据
+ * @param params
+ */
+ export function getLastJc(params) {
+  return Service({
+    url: "/api/getlastjc",
+    method: "post",
+    data: params
+  });
+}
 /**
  * 获取加载数据
  * @param params
@@ -346,3 +358,4 @@ export function updateAndDelMenu(params) {
       params: params
     });
 }
+

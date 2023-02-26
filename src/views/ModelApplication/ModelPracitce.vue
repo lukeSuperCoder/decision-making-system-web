@@ -36,6 +36,7 @@
             <div class="header-item">
                 <el-button type="primary" @click="openSetDialog" v-show="form.chart_type.length<=1">确定</el-button>
                 <el-button type="primary" @click="openSetDialog" v-show="form.chart_type.length>1">模型对比</el-button>
+                <el-button type="primary" @click="setLoadData" v-show="form.chart_type.length<=1">保存</el-button>
                 <!-- <el-button type="primary" @click="getCharts">查询</el-button> -->
             </div>
         </el-row>
@@ -98,7 +99,7 @@
 <script>
     import * as echarts from 'echarts';
     import {
-        getNoMenu,getParamsMenu,getBaseChartByParam,getLoad,getValueLoad,getJcData
+        getNoMenu,getParamsMenu,getBaseChartByParam,getLoad,getValueLoad,getJcData, setLoad
     } from '../../utils/request';
     export default {
         name: "AbnormalData",
@@ -347,6 +348,17 @@
                 var arr = name.split('_');
                 var name_str = arr[0]+'-'+arr[1]
                 this.data_name = name_str;
+            },
+            setLoadData() {
+                var params = {
+                    name: this.form.chart_type,
+                    numbers: JSON.stringify(this.map_form)
+                }
+                setLoad(params).then((res) => {
+                    if(res.code===200) {
+                        this.$message.success('载入成功')
+                    }
+                }) 
             },
             getValueGy() {
                 var str = ''
