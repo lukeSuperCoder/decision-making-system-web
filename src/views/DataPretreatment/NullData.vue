@@ -322,6 +322,14 @@
                 //     "chart": "1"
                 // }
                 console.log(params);
+                let excel_params = JSON.parse(JSON.stringify(params))
+                excel_params.pageSize = -1
+                excel_params.chart = '4'
+                getKnnChart(excel_params).then((res) => {
+                    if(res.code === 200) {
+                        this.json_data = res.data;
+                    }
+                })
                 this.series_list = []
                 if(this.form.chart_type==='1') {
                     this.tableData_visible = false;

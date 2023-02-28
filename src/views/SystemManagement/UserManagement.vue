@@ -188,13 +188,54 @@ import { sessionClear,sessionGet, sessionSet } from "../../utils/auth";
     },
     computed: {},
     mounted() {
-      this.getUserData();
       this.is_super_globel = sessionGet("issuper")
+      if(this.is_super_globel==='1') {
+        var name = sessionGet("userName")
+        this.initUserData(name);
+      } else {
+        this.getUserData()
+      }    
     },
     methods: {
       getUserData() {
+        if(this.is_super_globel==='1') {
+          var name = sessionGet("userName")
+          if(this.username!==name) {
+            if(this.username==='') {
+              this.initUserData(name);
+            } else {
+              this.tableData = []
+              this.$message.info('暂无数据')
+            }
+          } else {
+            this.initUserData(name);
+          }
+          return
+        }
         var params = {
           name: this.username,
+          pageNo: this.pageNo,
+          pageSize: this.pageSize
+        }
+        getUserInfo(params).then((res) => {
+          if (res.code === 200) {
+            this.tableData = res.data;
+            if(this.tableData.length===0) {
+              this.$message.info('暂无数据')
+            } else {
+              this.tableData.forEach((item) => {
+                item.createtime = dateUtil.formatDateYmdhms(new Date(item.createtime));
+                item.lasttime = dateUtil.formatDateYmdhms(new Date(item.lasttime));
+              })
+            }
+            
+            this.total = res.total;
+          }
+        })
+      },
+      initUserData(name) {
+        var params = {
+          name: name,
           pageNo: this.pageNo,
           pageSize: this.pageSize
         }
@@ -205,14 +246,6 @@ import { sessionClear,sessionGet, sessionSet } from "../../utils/auth";
               item.createtime = dateUtil.formatDateYmdhms(new Date(item.createtime));
               item.lasttime = dateUtil.formatDateYmdhms(new Date(item.lasttime));
             })
-            if(this.is_super_globel==='1') {
-              var name = sessionGet("userName")
-              this.tableData =this.tableData.filter((item) => {
-                if(item.username === name) {
-                  return item
-                }      
-              })
-            }
             this.total = res.total;
           }
         })

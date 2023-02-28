@@ -52,7 +52,7 @@
             </div>
         </el-row>
         <el-row class="header" style=" height: 60px;">
-            <div class="header-item"  style="display: flex; height: 50%; align-items: center;margin-top: 10px;">
+            <div class="header-item"  style="width: 100%; display: flex; height: 50%; justify-content: center; align-items: center;margin-top: 10px;">
                 <el-button type="primary" @click="getKnnCharts">执行</el-button>
                 <el-button type="primary" @click="deleteAbnCharts">删除</el-button>
                 <el-button type="primary" @click="setloadData">载入</el-button>
@@ -195,6 +195,202 @@
                 json_data: [               //表格数据
 
                 ],
+                param_key: {
+                    knn_xyz: {
+                        CLL:       2590.000000,
+                        SDDY:        3.805000,
+                        LSP :         4.833333,
+                        DJWD:       921.000000,
+                        FZB:       2.515000,
+                        GZDY:       3.850000,
+                        PJDY:        3.844000,
+                        XLCS:     1476.500000,
+                        YHLND:       1.135000,
+                        ZZ:        2.166667
+                    },
+                    knn_syz: {
+                        CLL:      2910.000000,
+                        SDDY:         4.245000,
+                        LSP:         43.500000,
+                        DJWD:      947.666667,
+                        FZB:          2.715000,
+                        GZDY:         4.292667,
+                        PJDY :       4.292000,
+                        XLCS:    2064.500000,
+                        YHLND:      2.481667,
+                        ZZ:      19.500000,
+                        number :   5104.500000,
+                        list :      221.000000
+                    },
+                    jz_xyz: {
+                        SDDY:         3.8125,
+                        CLL:       2640.0000,
+                        LSP:          2.4115,
+                        YHLND:        1.3000,
+                        DJWD:       926.0000,
+                        FZB:          2.5300,
+                        GZDY:         3.8635,
+                        PJDY:         3.8660,
+                        XLCS:      1500.5000,
+                        ZZ :          3.0000
+                    },
+                    jz_syz: {
+                        SDDY:         4.2325,
+                        CLL:       2880.0000,
+                        LSP:         70.6475,
+                        YHLND:        2.3400,
+                        DJWD:       942.0000,
+                        FZB :         2.6900,
+                        GZDY :        4.2675,
+                        PJDY :        4.2660,
+                        XLCS :     2048.5000,
+                        ZZ  :        19.0000
+                    },
+                    sls_xyz: {
+                        SDDY:         3.8050,
+                        CLL:       2590.0000,
+                        LSP :       -52.5000,
+                        YHLND :       1.0450,
+                        DJWD:       919.5000,
+                        FZB :         2.5150,
+                        GZDY:         3.8330,
+                        PJDY :        3.8365,
+                        XLCS:      1436.5000,
+                        ZZ  :         3.0000
+                    },
+                    sls_syz: {
+                        SDDY:         4.2450,
+                        CLL:       2910.0000,
+                        LSP:        159.5000,
+                        YHLND :       2.6050,
+                        DJWD:       947.5000,
+                        FZB:          2.7150,
+                        GZDY:         4.3050,
+                        PJDY:         4.2965,
+                        XLCS :     2088.5000,
+                        ZZ :         19.0000
+                    },
+                    xls_xyz: {
+                        SDDY:         3.805000,
+                        CLL:       2590.000000,
+                        LSP:        -52.500000,
+                        YHLND :       1.100000,
+                        DJWD:       919.500000,
+                        FZB :         2.490000,
+                        GZDY :        3.835125,
+                        PJDY :        3.836500,
+                        XLCS:      1439.000000,
+                        ZZ :          3.000000
+                    },
+                    xls_syz: {
+                        SDDY:         4.245000,
+                        CLL:       2910.000000,
+                        LSP :       159.500000,
+                        YHLND :       2.540000,
+                        DJWD:       947.500000,
+                        FZB:          2.730000,
+                        GZDY:         4.302125,
+                        PJDY :        4.296500,
+                        XLCS:      2087.000000,
+                        ZZ :         19.000000
+                    },
+                    zs_xyz: {
+                        SDDY :        3.7625,
+                        CLL:       2640.0000,
+                        LSP:        -65.0000,
+                        YHLND:        1.3000,
+                        DJWD:       926.0000,
+                        FZB :         2.5300,
+                        GZDY:         3.8215,
+                        PJDY:         3.8645,
+                        XLCS:      1500.5000,
+                        ZZ :          3.0000
+                    },
+                    zs_syz: {
+                        SDDY:         4.2625,
+                        CLL:       2880.0000,
+                        LSP :       183.0000,
+                        YHLND :       2.3400,
+                        DJWD:       942.0000,
+                        FZB :         2.6900,
+                        GZDY:         4.3375,
+                        PJDY:         4.2685,
+                        XLCS:      2048.5000,
+                        ZZ :         19.0000
+                    },
+                    zws_xyz: {
+                        SDDY:         3.8125,
+                        CLL:       2640.0000,
+                        LSP :        23.5000,
+                        YHLND :       0.1300,
+                        DJWD :      921.0000,
+                        FZB :         2.5300,
+                        GZDY :        3.8620,
+                        PJDY :        3.8345,
+                        XLCS:      1500.5000,
+                        ZZ :          3.0000
+                    },
+                    zws_syz: {
+                        SDDY:         4.2325,
+                        CLL:       2880.0000,
+                        LSP :        35.5000,
+                        YHLND :       4.2900,
+                        DJWD:       945.0000,
+                        FZB:          2.6900,
+                        GZDY:         4.2700,
+                        PJDY:         4.3185,
+                        XLCS:      2048.5000,
+                        ZZ :         19.0000
+                    },
+                    zdz_xyz: {
+                        SDDY:         3.7900,
+                        CLL:       2640.0000,
+                        LSP :       -65.0000,
+                        YHLND:        0.1300,
+                        DJWD:       828.5000,
+                        FZB:          2.3500,
+                        GZDY:         3.8215,
+                        PJDY:         3.8300,
+                        XLCS:      1401.5000,
+                        ZZ:          -1.5000
+                    },
+                    zdz_syz: {
+                        SDDY:         4.2700,
+                        CLL:       2880.0000,
+                        LSP:        183.0000,
+                        YHLND:        4.2900,
+                        DJWD:      1104.5000,
+                        FZB:          2.9900,
+                        GZDY :        4.3375,
+                        PJDY:         4.3260,
+                        XLCS:      2213.5000,
+                        ZZ:          26.5000
+                    },
+                    zxz_xyz: {
+                        SDDY:         3.7625,
+                        CLL:       2440.0000,
+                        LSP:        -41.5000,
+                        YHLND:        0.4000,
+                        DJWD:     -1171.5000,
+                        FZB :         2.3050,
+                        GZDY:         3.7935,
+                        PJDY :        3.7960,
+                        XLCS :     1365.5000,
+                        ZZ :          0.5000
+                    },
+                    zxz_syz: {
+                        SDDY:         4.2625,
+                        CLL:       3000.0000,
+                        LSP :        74.5000,
+                        YHLND :       2.8800,
+                        DJWD:      2200.5000,
+                        FZB :         2.8250,
+                        GZDY:         4.3095,
+                        PJDY:         4.3080,
+                        XLCS:      2129.5000,
+                        ZZ:          20.5000
+                    }
+                }
             }
         },
         computed: {},
