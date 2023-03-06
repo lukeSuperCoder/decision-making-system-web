@@ -43,6 +43,7 @@
         <el-row class="content">
             <el-card class="card">
                 <el-table
+                    v-show="tableData_visible"
                     :data="tableData"
                     style="width: 100%">
                     <el-table-column
@@ -53,7 +54,7 @@
                     </el-table-column>
                     </el-table>
                     <div class="pagediv">
-                    <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageNo"
+                    <el-pagination v-show="tableData_visible" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageNo"
                     :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper"
                     :total="total">
                     </el-pagination>
@@ -106,6 +107,7 @@
         components: {},
         data() {
             return {
+                tableData_visible: false,
                 dialogVisible: false,
                 paramsText: '',
                 tree_data: [],
@@ -662,7 +664,7 @@
                     })
                 })
                 var params = {
-                    "param": para_str.substring(0,para_str.length-1),
+                    "param": para_str.substring(0,para_str.length-1).replace('-','_'),
                     "date": this.form.date.toString(),
                     "pageNo": this.pageNo,
                     "pageSize": this.pageSize,
@@ -670,6 +672,7 @@
                 }
                 getJcData(params).then((res) => {
                     if(res.code === 200) {
+                        this.tableData_visible = true;
                         this.tableColumn = Object.keys(res.data[0])
                         this.tableData = res.data;
                         this.dialogVisible = false;

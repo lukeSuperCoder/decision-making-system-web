@@ -390,7 +390,49 @@
                         XLCS:      2129.5000,
                         ZZ:          20.5000
                     }
-                }
+                },
+                params_param_key: [
+                        {
+                            "value": "CLL",
+                            "label": "槽控工艺报出铝量 (kg)"
+                        },
+                        {
+                            "value": "FZB",
+                            "label": "槽控工艺报分子比 (N/A)"
+                        },
+                        {
+                            "value": "YHLND",
+                            "label": "槽控工艺报氧化铝浓度 (%)"
+                        },
+                        {
+                            "value": "DJWD",
+                            "label": "槽控工艺报电解温度 (℃)"
+                        },
+                        {
+                            "value": "LSP",
+                            "label": "槽控工艺报铝水平 (cm)"
+                        },
+                        {
+                            "value": "XLCS",
+                            "label": "槽控日报下料次数 (次)"
+                        },
+                        {
+                            "value": "GZDY",
+                            "label": "槽控日报工作电压 (V)"
+                        },
+                        {
+                            "value": "PJDY",
+                            "label": "槽控日报平均电压 (V)"
+                        },
+                        {
+                            "value": "SDDY",
+                            "label": "槽控日报设定电压 (V)"
+                        },
+                        {
+                            "value": "ZZ",
+                            "label": "槽控日报针振 (mV)"
+                        }
+                    ]
             }
         },
         computed: {},
@@ -572,6 +614,7 @@
                                             series_i.push([data_i.time, parseFloat(data_i.value).toFixed(3)])
                                         }
                                     })
+                                    let mark_line_data = this.getMarkLine(params)
                                     series.push({
                                         name: code_i,
                                         type: 'line',
@@ -582,7 +625,7 @@
                                         },
                                         data: series_i,
                                         markLine: {
-                                            data: [{ type: 'min', name: '最小值' },{ type: 'max', name: '最大值' }]
+                                            data: mark_line_data
                                         }
                                     })
                                 });
@@ -704,8 +747,56 @@
                 this.pageNo = val
                 this.getKnnCharts();
             },
+            getMarkLine(params) {
+                let params_name = ''
+                this.params_param_key.forEach((i) => {
+                    if(params.params===i.label) {
+                        params_name = i.value
+                    }
+                })
+                var data = []
+                data.push({ yAxis: this.param_key[params.fun1.split('_')[0]+'_syz'][params_name] })
+                data.push({ yAxis: this.param_key[params.fun1.split('_')[0]+'_xyz'][params_name] })
+                return data
+            },
+            getNumberMax(num) {
+                var i = parseInt(num);
+	            var l=0;
+                var res = parseInt(num)
+                while(i >= 1){
+                    i=i/10;
+                    l++;
+                }
+                switch(l) {
+                    case 1: res=res+1;break;
+                    case 2: res=res+10;break;
+                    case 3: res=res+50;break;
+                    case 4: res=res+100;break;
+                }
+			    return res
+            },
+            getNumberMin(num) {
+                var i = parseInt(num);
+	            var l=0;
+                var res = parseInt(num)
+                while(i >= 1){
+                    i=i/10;
+                    l++;
+                }
+                switch(l) {
+                    case 1: res=res-1;break;
+                    case 2: res=res-10;break;
+                    case 3: res=res-50;break;
+                    case 4: res=res-100;break;
+                }
+			    return res
+            },
             drawChart1() {
                 this.series_list.forEach((series_i) => {
+                    let range = series_i.data[0].markLine.data;
+                    let range_max = this.getNumberMax(range[0].yAxis)
+                    let range_min = this.getNumberMin(range[1].yAxis)
+                    console.log(range_max,range_min);
                     // 基于准备好的dom，初始化echarts实例  这个和上面的main对应
                     let myChart = echarts.init(document.getElementById(series_i.name));
                     // 指定图表的配置项和数据
@@ -722,11 +813,11 @@
                     },
                     toolbox: {
                         feature: {
-                        dataZoom: {
-                            yAxisIndex: 'none'
-                        },
-                        restore: {},
-                        saveAsImage: {}
+                            dataZoom: {
+                                yAxisIndex: 'none'
+                            },
+                            restore: {},
+                            saveAsImage: {}
                         }
                     },
                     xAxis: {
@@ -736,12 +827,8 @@
                     yAxis: {
                         type: 'value',
                         boundaryGap: [0, '100%'],
-                        min: function (value) {
-                            return value.min - 0.1;
-                        },
-                        max: function (value) {
-                            return value.max + 0.1;
-                        },
+                        min: range_min,
+                        max: range_max,
                     },
                     dataZoom: [
                         {
@@ -764,9 +851,9 @@
                     });  
                     //当 鼠标移出线条时触发 ，如果不处理这个，鼠标移到空白上还有tooltip显示。
                     myChart.on('mouseout', function (params) {
-                            console.log(params);
-                            // window.selectSeries = '';
-                        }); 
+                        console.log(params);
+                        // window.selectSeries = '';
+                    }); 
                 })
                 
             },
