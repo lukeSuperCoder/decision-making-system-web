@@ -664,7 +664,7 @@
                     })
                 })
                 var params = {
-                    "param": para_str.substring(0,para_str.length-1).replace('-','_'),
+                    "param": para_str.substring(0,para_str.length-1).replace(/-/g,'_'),
                     "date": this.form.date.toString(),
                     "pageNo": this.pageNo,
                     "pageSize": this.pageSize,
