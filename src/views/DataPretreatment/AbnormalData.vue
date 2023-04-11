@@ -559,8 +559,8 @@
                                 '兰州铝业电解铝板块一厂(400kA)五车间二工区5095#电解槽',
                                 '兰州铝业电解铝板块一厂(400kA)五车间二工区5096#电解槽']  
                 var that = this;
-                // let legend = ['槽控工艺报出铝量 (kg)','槽控日报设定电压 (V)','槽控工艺报铝水平 (cm)','槽控工艺报氧化铝浓度 (%)','槽控工艺报电解温度 (℃)',
-                // '槽控工艺报分子比 (N/A)','槽控日报工作电压 (V)','槽控日报平均电压 (V)','槽控日报下料次数 (次)','槽控日报针振 (mV)']
+                let legend = ['槽控工艺报出铝量 (kg)','槽控日报设定电压 (V)','槽控工艺报铝水平 (cm)','槽控工艺报氧化铝浓度 (%)','槽控工艺报电解温度 (℃)',
+                '槽控工艺报分子比 (N/A)','槽控日报工作电压 (V)','槽控日报平均电压 (V)','槽控日报下料次数 (次)','槽控日报针振 (mV)']
                 // that.form.params.forEach((j) => {
                 //     legend.splice(legend.indexOf(j),1)
                 // })
@@ -569,7 +569,7 @@
                 //     that.$message.warning('至少保留一项参数')
                 //     return
                 // }
-                let legend = [that.form.params];
+                // let legend = [that.form.params];
                 this.table_column = legend;
                 var str = '{"列表号":"list","槽号":"number","时间":"time",'
                 console.log(this.table_column);
@@ -600,6 +600,8 @@
                 // }
                 console.log(params);
                 let excel_params = JSON.parse(JSON.stringify(params))
+                excel_params.params = ['槽控工艺报出铝量 (kg)','槽控日报设定电压 (V)','槽控工艺报铝水平 (cm)','槽控工艺报氧化铝浓度 (%)','槽控工艺报电解温度 (℃)',
+                '槽控工艺报分子比 (N/A)','槽控日报工作电压 (V)','槽控日报平均电压 (V)','槽控日报下料次数 (次)','槽控日报针振 (mV)'].toString()
                 excel_params.pageSize = -1
                 excel_params.chart = '4'
                 getKnnChart(excel_params).then((res) => {
