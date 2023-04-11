@@ -565,11 +565,12 @@
                 //     legend.splice(legend.indexOf(j),1)
                 // })
                 
-                if(that.form.params.length===0) {
-                    that.$message.warning('至少保留一项参数')
-                    return
-                }
-                this.table_column = [that.form.params];
+                // if(that.form.params.length===0) {
+                //     that.$message.warning('至少保留一项参数')
+                //     return
+                // }
+                let legend = [that.form.params];
+                this.table_column = legend;
                 var str = '{"列表号":"list","槽号":"number","时间":"time",'
                 console.log(this.table_column);
                 this.table_column.forEach((i,index) => {
@@ -598,6 +599,14 @@
                 //     "chart": "1"
                 // }
                 console.log(params);
+                let excel_params = JSON.parse(JSON.stringify(params))
+                excel_params.pageSize = -1
+                excel_params.chart = '4'
+                getKnnChart(excel_params).then((res) => {
+                    if(res.code === 200) {
+                        this.json_data = res.data;
+                    }
+                })
                 this.series_list = []
                 if(this.form.chart_type==='1') {
                     this.tableData_visible = false;
