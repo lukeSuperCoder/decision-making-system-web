@@ -359,3 +359,15 @@ export function updateAndDelMenu(params) {
     });
 }
 
+/**
+ * 获取加载数据
+ * @param params
+ */
+ export function getPjValue(params) {
+  return Service({
+    url: "/api/getPjValue",
+    method: "post",
+    data: params
+  });
+}
+

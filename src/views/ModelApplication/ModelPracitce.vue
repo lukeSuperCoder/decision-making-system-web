@@ -27,7 +27,8 @@
             </div>
             <div class="header-item">
                 算法类型：
-                <el-select style="width:160px" v-model="form.chart_type" collapse-tags multiple placeholder="请选择" @change="changeType">
+                <el-select style="width:160px" v-model="form.chart_type" collapse-tags multiple placeholder="请选择"
+                    @change="changeType">
                     <el-option v-for="item in form.chart_options" :key="item.value" :label="item.label"
                         :value="item.value">
                     </el-option>
@@ -41,25 +42,33 @@
             </div>
         </el-row>
         <el-row class="content">
-            <el-card class="card">
-                <el-table
-                    v-show="tableData_visible"
-                    :data="tableData"
-                    style="width: 100%">
-                    <el-table-column
-                        v-for="o in tableColumn"
-                        :prop="o"
-                        :label="o"
-                        align="center">
-                    </el-table-column>
+            <el-card class="card" style="width: 100%;">
+                <el-row type="flex" justify="center" style="width: 100%;">
+                    <el-col :span="12">
+                        <el-table v-show="tableData_visible" :data="tableData" style="width: 100%">
+                            <el-table-column v-for="o in tableColumn" :prop="o" :label="o" align="center" show-overflow-tooltip>
+                            </el-table-column>
+                        </el-table>
+                        <div class="pagediv">
+                            <el-pagination v-show="tableData_visible" @size-change="handleSizeChange"
+                                @current-change="handleCurrentChange" :current-page="pageNo"
+                                :page-sizes="[10, 20, 50, 100]" :page-size="pageSize"
+                                layout="total, sizes, prev, pager, next, jumper" :total="total">
+                            </el-pagination>
+                        </div>
+                    </el-col>
+                    <el-col :span="12">
+                        <div id="echart-crad" style="height: 500px;overflow-y: auto;"></div>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-table v-show="pj_tableData_visible" :data="pj_tableData" style="width: 100%">
+                        <el-table-column v-for="o in pj_tableColumn" :prop="o" :label="o" align="center" show-overflow-tooltip>
+                        </el-table-column>
                     </el-table>
-                    <div class="pagediv">
-                    <el-pagination v-show="tableData_visible" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageNo"
-                    :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper"
-                    :total="total">
-                    </el-pagination>
-                    </div>
-                <div id="echart-crad"></div> 
+                </el-row>
+
+
                 <!-- <el-row type="flex" justify="center">
                     <div id="echart1" style="width: 100%; height: 400px"></div>
                 </el-row>
@@ -74,25 +83,22 @@
                 </el-row> -->
             </el-card>
         </el-row>
-        <el-dialog
-        title="参数设置"
-        :modal-append-to-body="false"
-        :visible.sync="dialogVisible"
-        width="40%">
-        <div style="height: 400px; overflow-y:auto">
-            <el-row class="header1" v-for="o in map_column">
-            <div class="header-item">
-               <div>参数：</div> <div class="blod">{{o}}</div>        
+        <el-dialog title="参数设置" :modal-append-to-body="false" :visible.sync="dialogVisible" width="40%">
+            <div style="height: 400px; overflow-y:auto">
+                <el-row class="header1" v-for="o in map_column">
+                    <div class="header-item">
+                        <div>参数：</div>
+                        <div class="blod">{{o}}</div>
+                    </div>
+                    <div class="header-item">
+                        值：<el-input style="width:160px" v-model="map_form[o]"></el-input>
+                    </div>
+                </el-row>
             </div>
-            <div class="header-item">
-                值：<el-input style="width:160px"  v-model="map_form[o]"></el-input>
-            </div>
-        </el-row>
-        </div>
-        
-        <span slot="footer" class="dialog-footer">
-            <el-button type="primary" @click="getJcChart">执 行</el-button>
-        </span>
+
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="getJcChart">执 行</el-button>
+            </span>
         </el-dialog>
     </div>
 </template>
@@ -100,7 +106,14 @@
 <script>
     import * as echarts from 'echarts';
     import {
-        getNoMenu,getParamsMenu,getBaseChartByParam,getLoad,getValueLoad,getJcData, setLoad
+        getNoMenu,
+        getParamsMenu,
+        getBaseChartByParam,
+        getLoad,
+        getValueLoad,
+        getJcData,
+        setLoad,
+        getPjValue
     } from '../../utils/request';
     export default {
         name: "AbnormalData",
@@ -109,6 +122,11 @@
             return {
                 tableData_visible: false,
                 dialogVisible: false,
+                tableColumn: [],
+                pj_tableData_visible: false,
+                pj_dialogVisible: false,
+                pj_tableData: [],
+                pj_tableColumn: [],
                 paramsText: '',
                 tree_data: [],
                 pageNo: 1,
@@ -217,8 +235,7 @@
                     params1: '',
                     params2: '',
                     params_options: [],
-                    params_options1: [
-                        {
+                    params_options1: [{
                             "value": "CLL",
                             "label": "槽控工艺报出铝量 (kg)"
                         },
@@ -227,8 +244,7 @@
                             "label": "槽控日报设定电压 (V)"
                         }
                     ],
-                    params_options2: [
-                        {
+                    params_options2: [{
                             "value": "CLL",
                             "label": "槽控工艺报出铝量 (kg)"
                         },
@@ -272,29 +288,30 @@
                     date: '',
                     chart_type: '',
                     chart_options: [{
-                        label: 'lstm',
-                        value: 'lstm'
-                    },
-                    {
-                        label: 'dflstm',
-                        value: 'dflstm'
-                    },
-                    {
-                        label: 'MPA_lstm',
-                        value: 'MPA_lstm'
-                    },
-                    {
-                        label: 'MPA_dflstm',
-                        value: 'MPA_dflstm'
-                    },
-                    {
-                        label: 'TF-MPA_lstm',
-                        value: 'TF-MPA_lstm'
-                    },
-                    {
-                        label: 'TF-MPA_dflstm',
-                        value: 'TF-MPA_dflstm'
-                    }]
+                            label: 'lstm',
+                            value: 'lstm'
+                        },
+                        {
+                            label: 'dflstm',
+                            value: 'dflstm'
+                        },
+                        {
+                            label: 'MPA_lstm',
+                            value: 'MPA_lstm'
+                        },
+                        {
+                            label: 'MPA_dflstm',
+                            value: 'MPA_dflstm'
+                        },
+                        {
+                            label: 'TF-MPA_lstm',
+                            value: 'TF-MPA_lstm'
+                        },
+                        {
+                            label: 'TF-MPA_dflstm',
+                            value: 'TF-MPA_dflstm'
+                        }
+                    ]
                 },
                 map_column: [],
                 map_form: {
@@ -338,7 +355,7 @@
             },
             getLoadData(name) {
                 // console.log(this.form.chart_type);
-                
+
                 // console.log(str);
                 getLoad({
                     name: name,
@@ -348,7 +365,7 @@
                     }
                 })
                 var arr = name.split('_');
-                var name_str = arr[0]+'-'+arr[1]
+                var name_str = arr[0] + '-' + arr[1]
                 this.data_name = name_str;
             },
             setLoadData() {
@@ -357,18 +374,18 @@
                     numbers: JSON.stringify(this.map_form)
                 }
                 setLoad(params).then((res) => {
-                    if(res.code===200) {
+                    if (res.code === 200) {
                         this.$message.success('载入成功')
                     }
-                }) 
+                })
             },
             getValueGy() {
                 var str = ''
-                this.form.chart_type.forEach((i,index) => {
-                    if(index===this.form.chart_type.length-1) {
-                        str+='`'+i+'_隐藏层层数`,'+'`'+i+'_隐藏层神经元个数`,'+'`'+i+'_学习率`'
+                this.form.chart_type.forEach((i, index) => {
+                    if (index === this.form.chart_type.length - 1) {
+                        str += '`' + i + '_隐藏层层数`,' + '`' + i + '_隐藏层神经元个数`,' + '`' + i + '_学习率`'
                     } else {
-                        str+='`'+i+'_隐藏层层数`,'+'`'+i+'_隐藏层神经元个数`,'+'`'+i+'_学习率`,'
+                        str += '`' + i + '_隐藏层层数`,' + '`' + i + '_隐藏层神经元个数`,' + '`' + i + '_学习率`,'
                     }
                 })
                 getValueLoad({
@@ -395,11 +412,11 @@
                 })
             },
             handleCheckChange() {
-                
+
             },
             changeType() {
                 console.log(this.form.chart_type);
-                if(this.form.chart_type.length===1) {
+                if (this.form.chart_type.length === 1) {
 
                 }
             },
@@ -420,7 +437,9 @@
                 this.getJcChart();
             },
             getCharts() {
-                var code_arr = this.$refs['tree'].getCheckedNodes().map((item) => {return item.value})
+                var code_arr = this.$refs['tree'].getCheckedNodes().map((item) => {
+                    return item.value
+                })
                 // var params = {
                 //     code: code_arr.toString(),
                 //     params: this.form.params.toString(),
@@ -436,7 +455,7 @@
                 console.log(params);
                 this.series_list = []
                 getBaseChartByParam(params).then((res) => {
-                    if(res.code === 200) {
+                    if (res.code === 200) {
                         let resdata = res.data;
                         var html = ''
                         resdata.forEach((res_i) => {
@@ -444,8 +463,9 @@
                             code_arr.forEach(code_i => {
                                 var series_i = []
                                 res_i.data.forEach((data_i) => {
-                                    if(code_i === data_i.code) {
-                                        series_i.push([data_i.time, parseFloat(data_i.value)])
+                                    if (code_i === data_i.code) {
+                                        series_i.push([data_i.time, parseFloat(data_i
+                                            .value)])
                                     }
                                 })
                                 series.push({
@@ -463,22 +483,23 @@
                                 name: res_i.name,
                                 data: series
                             });
-                            html = html + `<el-row type="flex" justify="center"><div id="${res_i.name}" style="width: 100%; height: 400px"></div></el-row>`
+                            html = html +
+                                `<el-row type="flex" justify="center"><div id="${res_i.name}" style="width: 100%; height: 400px"></div></el-row>`
                         })
                         console.log(this.series_list);
                         document.getElementById('echart-crad').innerHTML = html
-                        this.drawChart1(x_data,y_data);
-                        this.drawChart2(x_data,y_data);
+                        this.drawChart1(x_data, y_data);
+                        this.drawChart2(x_data, y_data);
                     }
                 })
                 // this.drawChart2();
                 // this.drawChart3();
             },
-            drawChart1(x_data,y_data) {
-                    // 基于准备好的dom，初始化echarts实例  这个和上面的main对应
-                    let myChart = echarts.init(document.getElementById('echart1'));
-                    // 指定图表的配置项和数据
-                    let option = { 
+            drawChart1(x_data, y_data) {
+                // 基于准备好的dom，初始化echarts实例  这个和上面的main对应
+                let myChart = echarts.init(document.getElementById('echart1'));
+                // 指定图表的配置项和数据
+                let option = {
                     tooltip: {
                         trigger: 'axis',
                         position: function (pt) {
@@ -491,11 +512,11 @@
                     },
                     toolbox: {
                         feature: {
-                        dataZoom: {
-                            yAxisIndex: 'none'
-                        },
-                        restore: {},
-                        saveAsImage: {}
+                            dataZoom: {
+                                yAxisIndex: 'none'
+                            },
+                            restore: {},
+                            saveAsImage: {}
                         }
                     },
                     xAxis: {
@@ -512,37 +533,36 @@
                             return value.max + 0.1;
                         },
                     },
-                    dataZoom: [
-                        {
-                        type: 'inside',
-                        start: 0,
-                        end: 200
+                    dataZoom: [{
+                            type: 'inside',
+                            start: 0,
+                            end: 200
                         },
                         {
-                        start: 0,
-                        end: 20
+                            start: 0,
+                            end: 20
                         }
                     ],
                     series: y_data
-                    }; 
-                    // 使用刚指定的配置项和数据显示图表。
-                    myChart.setOption(option);
-                    //当 鼠标移到线条上时触发
-                    myChart.on('click', function (params) {
-                        console.log(params);
-                    });  
-                    //当 鼠标移出线条时触发 ，如果不处理这个，鼠标移到空白上还有tooltip显示。
-                    myChart.on('mouseout', function (params) {
-                            console.log(params);
-                            // window.selectSeries = '';
-                        }); 
-                
+                };
+                // 使用刚指定的配置项和数据显示图表。
+                myChart.setOption(option);
+                //当 鼠标移到线条上时触发
+                myChart.on('click', function (params) {
+                    console.log(params);
+                });
+                //当 鼠标移出线条时触发 ，如果不处理这个，鼠标移到空白上还有tooltip显示。
+                myChart.on('mouseout', function (params) {
+                    console.log(params);
+                    // window.selectSeries = '';
+                });
+
             },
-            drawChart2(x_data,y_data) {
-                    // 基于准备好的dom，初始化echarts实例  这个和上面的main对应
-                    let myChart = echarts.init(document.getElementById('echart2'));
-                    // 指定图表的配置项和数据
-                    let option = { 
+            drawChart2(x_data, y_data) {
+                // 基于准备好的dom，初始化echarts实例  这个和上面的main对应
+                let myChart = echarts.init(document.getElementById('echart2'));
+                // 指定图表的配置项和数据
+                let option = {
                     tooltip: {
                         trigger: 'axis',
                         position: function (pt) {
@@ -555,11 +575,11 @@
                     },
                     toolbox: {
                         feature: {
-                        dataZoom: {
-                            yAxisIndex: 'none'
-                        },
-                        restore: {},
-                        saveAsImage: {}
+                            dataZoom: {
+                                yAxisIndex: 'none'
+                            },
+                            restore: {},
+                            saveAsImage: {}
                         }
                     },
                     xAxis: {
@@ -576,31 +596,30 @@
                             return value.max + 0.1;
                         },
                     },
-                    dataZoom: [
-                        {
-                        type: 'inside',
-                        start: 0,
-                        end: 200
+                    dataZoom: [{
+                            type: 'inside',
+                            start: 0,
+                            end: 200
                         },
                         {
-                        start: 0,
-                        end: 20
+                            start: 0,
+                            end: 20
                         }
                     ],
                     series: y_data
-                    }; 
-                    // 使用刚指定的配置项和数据显示图表。
-                    myChart.setOption(option);
-                    //当 鼠标移到线条上时触发
-                    myChart.on('click', function (params) {
-                        console.log(params);
-                    });  
-                    //当 鼠标移出线条时触发 ，如果不处理这个，鼠标移到空白上还有tooltip显示。
-                    myChart.on('mouseout', function (params) {
-                            console.log(params);
-                            // window.selectSeries = '';
-                        }); 
-                
+                };
+                // 使用刚指定的配置项和数据显示图表。
+                myChart.setOption(option);
+                //当 鼠标移到线条上时触发
+                myChart.on('click', function (params) {
+                    console.log(params);
+                });
+                //当 鼠标移出线条时触发 ，如果不处理这个，鼠标移到空白上还有tooltip显示。
+                myChart.on('mouseout', function (params) {
+                    console.log(params);
+                    // window.selectSeries = '';
+                });
+
             },
             drawChart3() {
                 // 基于准备好的dom，初始化echarts实例  这个和上面的main对应
@@ -660,18 +679,19 @@
                 var para_str = ''
                 this.form.params1.forEach((i) => {
                     this.form.chart_type.forEach((j) => {
-                        para_str+=i+'_ture,'+i+'_'+j+'_pred,'
+                        para_str += i + '_ture,' + i + '_' + j + '_pred,'
                     })
                 })
                 var params = {
-                    "param": para_str.substring(0,para_str.length-1).replace(/-/g,'_'),
+                    "param": para_str.substring(0, para_str.length - 1).replace(/-/g, '_'),
                     "date": this.form.date.toString(),
                     "pageNo": this.pageNo,
                     "pageSize": this.pageSize,
-                    "tablename": this.data_name+'-jc'
+                    "tablename": this.data_name + '-jc'
                 }
+                this.getPjData();
                 getJcData(params).then((res) => {
-                    if(res.code === 200) {
+                    if (res.code === 200) {
                         this.tableData_visible = true;
                         this.tableColumn = Object.keys(res.data[0])
                         this.tableData = res.data;
@@ -694,35 +714,70 @@
                                 arr_obj[index].data.push(parseFloat(item[j]))
                             })
                         })
-                        var cll_ydata= []
-                        var sddy_ydata= []
+                        var cll_ydata = []
+                        var sddy_ydata = []
                         arr_obj.forEach((o) => {
-                            if(o.name!=='time'&&o.name!=='SDDY_ture'&&o.name!=='CLL_ture') {
-                                if(o.name.split('_')[0]==='CLL') {
+                            if (o.name !== 'time' && o.name !== 'SDDY_ture' && o.name !== 'CLL_ture') {
+                                if (o.name.split('_')[0] === 'CLL') {
                                     cll_ydata.push(o)
-                                }else {
+                                } else {
                                     sddy_ydata.push(o)
                                 }
                             }
                         })
                         let html = ''
-                        if(this.form.params1.length===1) {
-                            if(this.form.params1[0]==='CLL') {
-                                html = `<el-row type="flex" justify="center"><div id="echart1" style="width: 100%; height: 400px"></div></el-row>`
+                        if (this.form.params1.length === 1) {
+                            if (this.form.params1[0] === 'CLL') {
+                                html =
+                                    `<el-row type="flex" justify="center"><div id="echart1" style="width: 100%; height: 400px"></div></el-row>`
                                 document.getElementById('echart-crad').innerHTML = html
-                                this.drawChart1(x_data,cll_ydata);
+                                this.drawChart1(x_data, cll_ydata);
                             } else {
-                                html = `<el-row type="flex" justify="center"><div id="echart2" style="width: 100%; height: 400px"></div></el-row>`
+                                html =
+                                    `<el-row type="flex" justify="center"><div id="echart2" style="width: 100%; height: 400px"></div></el-row>`
                                 document.getElementById('echart-crad').innerHTML = html
-                                this.drawChart2(x_data,sddy_ydata);
+                                this.drawChart2(x_data, sddy_ydata);
                             }
-                        } else if(this.form.params1.length===2) {
-                            html = `<el-row type="flex" justify="center"><div id="echart1" style="width: 100%; height: 400px"></div></el-row><el-row type="flex" justify="center"><div id="echart2" style="width: 100%; height: 400px"></div></el-row>`
+                        } else if (this.form.params1.length === 2) {
+                            html =
+                                `<el-row type="flex" justify="center"><div id="echart1" style="width: 100%; height: 400px"></div></el-row><el-row type="flex" justify="center"><div id="echart2" style="width: 100%; height: 400px"></div></el-row>`
                             document.getElementById('echart-crad').innerHTML = html
-                            this.drawChart1(x_data,cll_ydata);
-                            this.drawChart2(x_data,sddy_ydata);
+                            this.drawChart1(x_data, cll_ydata);
+                            this.drawChart2(x_data, sddy_ydata);
                         }
-                        
+
+                    }
+                })
+            },
+            getPjData() {
+                var para_str = ''
+                var type_str = ''
+                this.form.chart_type.forEach((item) => {
+                    if(item==='dflstm') {
+                        item = 'FLSTM'
+                    }
+                    if(item==="TF-MPA_dflstm") {
+                        item = "TF-MPA_Flstm"
+                    }
+                    if(item==="MPA_dflstm") {
+                        item = "MPA_Flstm"
+                    }
+                    para_str += '`'+item+'-MAE`,`'+item+'-MAPE`,`'+item+'-RMSE`,'
+                    type_str +=  item+','
+                })
+                para_str = para_str.toUpperCase()
+                para_str = para_str.substring(0, para_str.length - 1).replace(/_/g, '-')
+                console.log(para_str);
+                let params = {
+                    type: type_str.substring(0, type_str.length - 1).toUpperCase().replace(/_/g, '-'),
+                    fun: para_str,
+                    name: this.form.origin.replace(/_/g, '-')
+                }
+                getPjValue(params).then((res) => {
+                    if (res.code === 200) {
+                        this.pj_tableColumn = Object.keys(res.data[0])
+                        this.pj_tableData = res.data;
+                        this.pj_tableData_visible = true;
                     }
                 })
             }
@@ -730,8 +785,8 @@
     };
 </script>
 
-<style  lang="scss" scoped>
-    .main ::v-deep{
+<style lang="scss" scoped>
+    .main ::v-deep {
         width: 100%;
         height: 100%;
 
@@ -748,6 +803,7 @@
                 width: 600px;
             }
         }
+
         .header1 {
             height: 60px;
             display: flex;
@@ -757,6 +813,7 @@
                 display: flex;
                 align-items: center;
                 margin-left: 20px;
+
                 .blod {
                     font-weight: 600;
                     font-size: 20px;
@@ -767,17 +824,23 @@
                 width: 600px;
             }
         }
+
         .content {
             margin-top: 20px;
             height: 890px;
 
             .card {
-                height: 100%;
-                overflow-y: auto;
+                width: 100%;
+
+                .echarts-main {
+                    width: 50%;
+                    height: 100%;
+                }
+
                 .pagediv {
                     height: 5rem;
                     display: flex;
-                    }
+                }
             }
         }
     }
