@@ -322,7 +322,14 @@
                     min_data_in_leaf: ''
                 },
                 series_list: [],
-                tableData: []
+                tableData: [],
+                map_form_temp: {
+                    num_leaves: '',
+                    eta: '',
+                    max_depth: '',
+                    min_data_in_leaf: ''
+                },
+                map_column_temp: []
             }
         },
         computed: {},
@@ -394,8 +401,8 @@
                     if (res.code === 200) {
                         console.log(res.data);
                         var data = JSON.parse(res.data[0].numbers)
-                        this.map_form = data
-                        this.map_column = Object.keys(data)
+                        this.map_form_temp = JSON.parse(JSON.stringify(data))
+                        this.map_column_temp = Object.keys(data)
                     }
                 })
             },
@@ -479,6 +486,8 @@
                 }
                 getLastJc(param).then((res) => {
                     if (res.code === 200) {
+                        this.map_form = this.map_form_temp
+                        this.map_column = this.map_column_temp
                         this.map_form1 = res.data[0]
                         this.map_column1 = Object.keys(res.data[0])
                         console.log(this.map_column1, this.map_form1);
