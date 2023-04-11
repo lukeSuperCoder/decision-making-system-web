@@ -474,7 +474,7 @@
                 })
                 console.log(para_str);
                 var param = {
-                    "params": para_str.substring(0, para_str.length - 1),
+                    "params": para_str.substring(0, para_str.length - 1).replace(/-/g,'_'),
                     "tablename": this.data_name + '-jc'
                 }
                 getLastJc(param).then((res) => {
