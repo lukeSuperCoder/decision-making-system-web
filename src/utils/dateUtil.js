@@ -41,6 +41,23 @@ let dateUtil = {
     tDate = this.doHandleMonth(tDate);
     return tYear + "-" + tMonth + "-" + tDate;
   },
+  /**
+   * 获取指定时间指定提前的时间
+   * @param date 当前时间
+   * @param day 提前时间
+   * @returns {string}
+   */
+   getDppointedDay: function (date, day) {
+    let today = new Date(date);
+    let targetday_milliseconds = today.getTime() - 1000 * 60 * 60 * 24 * day;
+    today.setTime(targetday_milliseconds); //注意，这行是关键代码
+    let tYear = today.getFullYear();
+    let tMonth = today.getMonth();
+    let tDate = today.getDate();
+    tMonth = this.doHandleMonth(tMonth + 1);
+    tDate = this.doHandleMonth(tDate);
+    return tYear + "-" + tMonth + "-" + tDate;
+  },
   doHandleMonth: function (month) {
     let m = month;
     if (month.toString().length === 1) {

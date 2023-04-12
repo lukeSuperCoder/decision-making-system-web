@@ -16,6 +16,15 @@
                         :value="item.value">
                     </el-option>
                 </el-select>
+                <span style="margin-left: 20px;">决策时间：</span>
+            </div>
+            <div>
+                <div class="block">
+                    <el-date-picker v-model="form.date" type="date" align="right" unlink-panels range-separator="至"
+                        placeholder="选择日期" format="yyyy 年 MM 月 dd 日"
+                        value-format="yyyy-MM-dd" :picker-options="pickerOptions" :default-value="new Date('2021-09-01T00:00:00.000Z')">
+                    </el-date-picker>
+                </div>
             </div>
             <div class="header-item">
                 模型：
@@ -115,11 +124,17 @@
         setLoad,
         getLastJc
     } from '../../utils/request';
+    import dateUtil from '../../utils/dateUtil'
     export default {
         name: "AbnormalData",
         components: {},
         data() {
             return {
+                pickerOptions: {
+                    disabledDate(time) {
+                        return time.getTime() < new Date('2021-09-01T00:00:00.000Z').getTime() || time.getTime() > new Date('2022-06-06T00:00:00.000Z').getTime() ;
+                    },
+                },
                 dialogVisible: false,
                 paramsText: '',
                 tree_data: [],
@@ -387,7 +402,7 @@
                     name: name,
                 }).then((res) => {
                     if (res.code === 200) {
-                        this.form.date = [res.data[0].start_time, res.data[0].end_time];
+                        // this.form.date = [res.data[0].start_time, res.data[0].end_time];
                     }
                 })
                 var arr = name.split('_');
@@ -479,8 +494,8 @@
                 this.form.params1.forEach((i) => {
                         para_str += i + '_' + this.form.chart_type + '_pred,'
                 })
-                console.log(para_str);
                 var param = {
+                    "date": dateUtil.getDppointedDay(this.form.date, 15),
                     "params": para_str.substring(0, para_str.length - 1).replace(/-/g,'_'),
                     "tablename": this.data_name + '-jc'
                 }
