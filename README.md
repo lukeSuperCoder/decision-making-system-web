@@ -1,7 +1,7 @@
 # CommonTemplate
 
 #### 介绍
-
+分析研判平台前端框架，使用vue2+echarts+elementUI
 基于 vue2.X 的前端通用模板，包含通用工具类，axios 封装，基础 webpack 配置等
 
 #### 软件架构
